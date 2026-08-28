@@ -37,6 +37,8 @@ Milestone 1 establishes the baseline technical research, system architecture, mu
 
 ### High-Level System Architecture
 
+![System Architecture Diagram](docs/system_architecture_diagram.jpg)
+
 ```mermaid
 flowchart TD
     subgraph UI ["1. User Interface & Speech Module"]
