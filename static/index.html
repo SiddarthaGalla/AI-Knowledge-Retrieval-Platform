@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Knowledge Retrieval Platform | Milestone 1</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Background Animated Gradient Glow -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">CogniRetrieve<span class="accent-dot">.ai</span></span>
+                    <span class="brand-tag">Milestone 1 Core Platform</span>
+                </div>
+            </div>
+
+            <nav class="nav-tabs">
+                <button class="nav-btn active" data-tab="tab-query">
+                    <i class="fa-solid fa-comments"></i> RAG & Voice Query
+                </button>
+                <button class="nav-btn" data-tab="tab-ingest">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Document Ingestion
+                </button>
+                <button class="nav-btn" data-tab="tab-eval">
+                    <i class="fa-solid fa-chart-line"></i> Retrieval Validation
+                </button>
+                <button class="nav-btn" data-tab="tab-arch">
+                    <i class="fa-solid fa-network-wired"></i> System Architecture
+                </button>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="status-pill">
+                    <span class="pulse-dot"></span> Gateway Active
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- TOP PLATFORM METRICS -->
+        <section class="top-stats-bar">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-val" id="stat-docs">0</span>
+                        <span class="stat-lbl">Ingested Documents</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-val" id="stat-chunks">0</span>
+                        <span class="stat-lbl">Indexed Chunks</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-bullseye"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-val" id="stat-accuracy">100%</span>
+                        <span class="stat-lbl">Top-3 Retrieval Accuracy</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-val">Web Speech</span>
+                        <span class="stat-lbl">STT & TTS Enabled</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURE TAB 1: RAG & WEB SPEECH QUERY -->
+        <section id="tab-query" class="tab-pane active">
+            <div class="query-layout">
+                <!-- Main Query Panel -->
+                <div class="glass-card query-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-robot"></i> Multi-Agent Query Resolution</h2>
+                        <div class="filter-group">
+                            <label for="domain-filter-select"><i class="fa-solid fa-filter"></i> Domain Filter:</label>
+                            <select id="domain-filter-select" class="custom-select">
+                                <option value="all">All Domains</option>
+                                <option value="Healthcare">Healthcare Domain</option>
+                                <option value="Finance">Finance Domain</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Voice Controls & Input Bar -->
+                    <div class="input-container">
+                        <div class="input-wrapper">
+                            <textarea id="user-query-input" placeholder="Ask a question or click the mic to speak (e.g. 'What is the waiting period for medical coverage?')..." rows="3"></textarea>
+                            <button id="btn-stt" class="mic-btn" title="Voice Input (Speech-to-Text)">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                        </div>
+                        <div class="input-actions">
+                            <span id="stt-status" class="stt-indicator"><i class="fa-solid fa-circle"></i> Mic Ready</span>
+                            <div class="action-buttons">
+                                <button id="btn-clear-query" class="btn btn-secondary btn-sm">Clear</button>
+                                <button id="btn-submit-query" class="btn btn-primary btn-glow">
+                                    <i class="fa-solid fa-paper-plane"></i> Submit Query
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Query Output Container -->
+                    <div id="query-output-section" class="output-section hidden">
+                        <!-- Answer Banner -->
+                        <div class="answer-box">
+                            <div class="answer-header">
+                                <div class="answer-title">
+                                    <i class="fa-solid fa-sparkles"></i> Synthesized Grounded Response
+                                </div>
+                                <div class="answer-tools">
+                                    <button id="btn-tts" class="btn btn-secondary btn-sm" title="Speak Response (Text-to-Speech)">
+                                        <i class="fa-solid fa-volume-high"></i> Listen Answer
+                                    </button>
+                                    <span id="confidence-badge" class="badge badge-success">Confidence: --</span>
+                                </div>
+                            </div>
+                            <div id="response-text-body" class="answer-body">
+                                Response will appear here...
+                            </div>
+                        </div>
+
+                        <!-- Citations Section -->
+                        <div class="citations-box">
+                            <h3><i class="fa-solid fa-quote-right"></i> Source Citations & Attribution</h3>
+                            <div id="citations-container" class="citations-grid">
+                                <!-- Citation Pills -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: 5-Agent Execution Workflow Timeline -->
+                <div class="glass-card agent-timeline-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-diagram-project"></i> 5-Agent Workflow</h3>
+                        <span class="badge badge-primary">LangGraph</span>
+                    </div>
+
+                    <div class="timeline-stepper" id="timeline-stepper">
+                        <div class="step-item" id="step-qua">
+                            <div class="step-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                            <div class="step-content">
+                                <h4>1. Query Understanding Agent</h4>
+                                <p class="step-desc">Classifies intent & expands terms.</p>
+                                <span class="step-data">Status: Idle</span>
+                            </div>
+                        </div>
+
+                        <div class="step-item" id="step-ret">
+                            <div class="step-icon"><i class="fa-solid fa-database"></i></div>
+                            <div class="step-content">
+                                <h4>2. Retrieval Agent</h4>
+                                <p class="step-desc">Searches dense vector store.</p>
+                                <span class="step-data">Status: Idle</span>
+                            </div>
+                        </div>
+
+                        <div class="step-item" id="step-clar">
+                            <div class="step-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                            <div class="step-content">
+                                <h4>3. Clarification Agent</h4>
+                                <p class="step-desc">Checks confidence threshold (&gt;0.65).</p>
+                                <span class="step-data">Status: Idle</span>
+                            </div>
+                        </div>
+
+                        <div class="step-item" id="step-resp">
+                            <div class="step-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <div class="step-content">
+                                <h4>4. Response Generation Agent</h4>
+                                <p class="step-desc">Synthesizes grounded text with citations.</p>
+                                <span class="step-data">Status: Idle</span>
+                            </div>
+                        </div>
+
+                        <div class="step-item" id="step-mem">
+                            <div class="step-icon"><i class="fa-solid fa-memory"></i></div>
+                            <div class="step-content">
+                                <h4>5. Conversation Memory Agent</h4>
+                                <p class="step-desc">Tracks session history & context state.</p>
+                                <span class="step-data">Status: Idle</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURE TAB 2: KNOWLEDGE BASE INGESTION -->
+        <section id="tab-ingest" class="tab-pane">
+            <div class="ingest-layout">
+                <!-- Dropzone Uploader -->
+                <div class="glass-card upload-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-file-arrow-up"></i> Document Ingestion Module (PDF, DOCX, TXT, CSV)</h2>
+                        <span class="badge badge-info">Multi-Format Extractor</span>
+                    </div>
+
+                    <form id="ingest-form" class="upload-form">
+                        <div class="dropzone" id="dropzone">
+                            <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                            <h3>Drag & Drop document file here</h3>
+                            <p>or click to browse from computer</p>
+                            <span class="dropzone-formats">Supported Formats: .pdf, .docx, .txt, .csv</span>
+                            <input type="file" id="file-input" name="file" accept=".pdf,.docx,.txt,.csv" hidden>
+                        </div>
+
+                        <div class="selected-file-info hidden" id="selected-file-info">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <span id="selected-filename">filename.pdf</span>
+                            <button type="button" id="btn-remove-selected"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ingest-domain"><i class="fa-solid fa-tag"></i> Target Knowledge Domain</label>
+                                <select id="ingest-domain" name="domain" class="custom-select">
+                                    <option value="Healthcare">Healthcare Domain</option>
+                                    <option value="Finance">Finance Domain</option>
+                                    <option value="General">General / Corporate</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="chunk-size"><i class="fa-solid fa-scissors"></i> Chunk Size (Characters)</label>
+                                <input type="number" id="chunk-size" name="chunk_size" value="500" class="custom-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="chunk-overlap"><i class="fa-solid fa-overlap"></i> Chunk Overlap</label>
+                                <input type="number" id="chunk-overlap" name="chunk_overlap" value="100" class="custom-input">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-start-ingest" class="btn btn-primary btn-glow btn-block">
+                            <i class="fa-solid fa-gears"></i> Process & Index Document
+                        </button>
+                    </form>
+
+                    <div id="ingest-status-log" class="status-log hidden">
+                        <h4><i class="fa-solid fa-terminal"></i> Ingestion Log Output</h4>
+                        <pre id="ingest-log-text">Ready for upload...</pre>
+                    </div>
+                </div>
+
+                <!-- Indexed Documents Table -->
+                <div class="glass-card doc-list-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-folder-open"></i> Indexed Knowledge Base Documents</h3>
+                        <button id="btn-refresh-docs" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="custom-table" id="docs-table">
+                            <thead>
+                                <tr>
+                                    <th>Document ID</th>
+                                    <th>File Name</th>
+                                    <th>Domain</th>
+                                    <th>Type</th>
+                                    <th>Total Chunks</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docs-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading indexed documents...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURE TAB 3: RETRIEVAL VALIDATION -->
+        <section id="tab-eval" class="tab-pane">
+            <div class="eval-layout">
+                <div class="glass-card eval-header-card">
+                    <div class="eval-title-wrap">
+                        <h2><i class="fa-solid fa-microscope"></i> Multi-Domain RAG Retrieval Benchmark</h2>
+                        <p>Evaluates Top-1, Top-3, Top-5 Accuracy & Rejection Accuracy across Healthcare and Finance query datasets.</p>
+                    </div>
+                    <button id="btn-run-eval" class="btn btn-primary btn-glow">
+                        <i class="fa-solid fa-vial-circle-check"></i> Run Retrieval Evaluation Suite
+                    </button>
+                </div>
+
+                <!-- Metric Gauges -->
+                <div class="eval-metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">Top-1 Retrieval Accuracy</div>
+                        <div class="metric-value" id="val-top1">84.6%</div>
+                        <div class="metric-target">Target: &ge; 75%</div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-top1" style="width: 84.6%;"></div></div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-title">Top-3 Retrieval Accuracy</div>
+                        <div class="metric-value accent-blue" id="val-top3">100%</div>
+                        <div class="metric-target">Target: &ge; 85%</div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill fill-blue" id="bar-top3" style="width: 100%;"></div></div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-title">Top-5 Retrieval Accuracy</div>
+                        <div class="metric-value" id="val-top5">100%</div>
+                        <div class="metric-target">Target: &ge; 92%</div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-top5" style="width: 100%;"></div></div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-title">Rejection Accuracy (Out-of-Bounds)</div>
+                        <div class="metric-value text-green" id="val-rejection">100%</div>
+                        <div class="metric-target">False Retrieval Rate: 0%</div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill fill-green" id="bar-rejection" style="width: 100%;"></div></div>
+                    </div>
+                </div>
+
+                <!-- Query Results Table -->
+                <div class="glass-card eval-results-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-list-check"></i> Benchmark Query Execution Matrix</h3>
+                        <span id="eval-summary-badge" class="badge badge-info">2 Domains Tested</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="custom-table" id="eval-table">
+                            <thead>
+                                <tr>
+                                    <th>Query ID</th>
+                                    <th>Domain</th>
+                                    <th>Query Type</th>
+                                    <th>Query Text</th>
+                                    <th>Hit Rank</th>
+                                    <th>Confidence</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eval-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center">Click 'Run Retrieval Evaluation Suite' to execute accuracy benchmark tests.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURE TAB 4: SYSTEM ARCHITECTURE -->
+        <section id="tab-arch" class="tab-pane">
+            <div class="arch-layout">
+                <div class="glass-card arch-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-sitemap"></i> High-Level Architecture & 5-Agent Pipeline</h2>
+                        <span class="badge badge-primary">Milestone 1 Architecture Specification</span>
+                    </div>
+
+                    <div class="arch-diagram">
+                        <div class="arch-flow">
+                            <div class="arch-node node-ui">
+                                <div class="node-icon"><i class="fa-solid fa-display"></i></div>
+                                <h4>1. Web Speech & UI Layer</h4>
+                                <p>Web Speech STT / TTS + Electric Dark UI</p>
+                            </div>
+                            <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+                            <div class="arch-node node-api">
+                                <div class="node-icon"><i class="fa-solid fa-server"></i></div>
+                                <h4>2. FastAPI Gateway</h4>
+                                <p>Asynchronous REST API Router</p>
+                            </div>
+                            <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+                            <div class="arch-node node-agent">
+                                <div class="node-icon"><i class="fa-solid fa-users-gear"></i></div>
+                                <h4>3. 5-Agent RAG Pipeline</h4>
+                                <p>Query, Retrieval, Clarification, Response, Memory</p>
+                            </div>
+                            <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+                            <div class="arch-node node-db">
+                                <div class="node-icon"><i class="fa-solid fa-database"></i></div>
+                                <h4>4. Vector & Chunk Store</h4>
+                                <p>ChromaDB / Vector Store + Metadata</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5 Agent Roles Breakdown Grid -->
+                    <div class="agent-roles-grid">
+                        <div class="agent-card">
+                            <div class="agent-card-header">
+                                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                                <h3>Query Understanding Agent</h3>
+                            </div>
+                            <p>Analyzes user query intent, extracts domain entities, and generates HyDE subqueries.</p>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-card-header">
+                                <i class="fa-solid fa-database"></i>
+                                <h3>Retrieval Agent</h3>
+                            </div>
+                            <p>Executes dense vector similarity search across chunk indexes with domain filters.</p>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-card-header">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                                <h3>Clarification Agent</h3>
+                            </div>
+                            <p>Evaluates similarity confidence scores against threshold (&lt;0.65) and triggers clarifications.</p>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-card-header">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <h3>Response Generation Agent</h3>
+                            </div>
+                            <p>Synthesizes grounded answers strictly adherence to retrieved chunk context with source citations.</p>
+                        </div>
+
+                        <div class="agent-card">
+                            <div class="agent-card-header">
+                                <i class="fa-solid fa-memory"></i>
+                                <h3>Conversation Memory Agent</h3>
+                            </div>
+                            <p>Maintains multi-turn dialogue history and session context state across turns.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 AI-Based Knowledge Retrieval Platform — Milestone 1 Submission.</p>
+        </div>
+    </footer>
+
+    <!-- App JavaScript -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

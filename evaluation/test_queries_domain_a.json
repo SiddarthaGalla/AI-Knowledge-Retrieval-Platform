@@ -1,0 +1,58 @@
+[
+  {
+    "id": "q_hc_01",
+    "type": "Factual",
+    "query": "What is the waiting period for full medical coverage eligibility?",
+    "expected_keywords": ["30 days", "continuous employment"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_02",
+    "type": "Factual",
+    "query": "What is the deductible for Plan A individual coverage?",
+    "expected_keywords": ["500", "deductible"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_03",
+    "type": "Procedural",
+    "query": "What are the steps to submit an out of network claim?",
+    "expected_keywords": ["Form HC-104", "itemized medical bill", "90 calendar days", "14 business days"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_04",
+    "type": "Comparative",
+    "query": "Compare coverage and deductible for Plan A versus Plan B",
+    "expected_keywords": ["Plan A", "Plan B", "500", "2,000", "HSA"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_05",
+    "type": "Factual",
+    "query": "What is the maximum emergency medical coverage prior to 30 days?",
+    "expected_keywords": ["2,000", "emergency medical"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_06",
+    "type": "Procedural",
+    "query": "How many days in advance is pre-authorization required for elective surgery?",
+    "expected_keywords": ["5 business days", "pre-authorization"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_07",
+    "type": "Factual",
+    "query": "What is the penalty for failing to obtain pre-authorization?",
+    "expected_keywords": ["30%", "reduction"],
+    "target_domain": "Healthcare"
+  },
+  {
+    "id": "q_hc_08",
+    "type": "Unavailable",
+    "query": "What is the company policy for pet insurance reimbursement?",
+    "expected_keywords": [],
+    "target_domain": "Healthcare"
+  }
+]

@@ -1,0 +1,21 @@
+# Python Cache & Environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.env
+
+# Vector Stores & Dynamic Uploads
+data/vector_store/
+data/vector_store_eval/
+data/uploads/
+
+# IDE & Logs
+.vscode/
+.idea/
+*.log
+.system_generated/

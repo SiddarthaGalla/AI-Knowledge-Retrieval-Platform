@@ -1,0 +1,51 @@
+[
+  {
+    "id": "q_fin_01",
+    "type": "Factual",
+    "query": "What is the daily per diem meal allowance?",
+    "expected_keywords": ["75", "meal", "breakfast"],
+    "target_domain": "Finance"
+  },
+  {
+    "id": "q_fin_02",
+    "type": "Factual",
+    "query": "What is the maximum lodging allowance for domestic hotel stay?",
+    "expected_keywords": ["250", "lodging", "hotel"],
+    "target_domain": "Finance"
+  },
+  {
+    "id": "q_fin_03",
+    "type": "Procedural",
+    "query": "What are the rules for software license procurement approval?",
+    "expected_keywords": ["5000", "IT & Finance Approval", "security"],
+    "target_domain": "Finance"
+  },
+  {
+    "id": "q_fin_04",
+    "type": "Factual",
+    "query": "What is the threshold for corporate gift acceptance requiring compliance approval?",
+    "expected_keywords": ["100", "gift", "compliance"],
+    "target_domain": "Finance"
+  },
+  {
+    "id": "q_fin_05",
+    "type": "Comparative",
+    "query": "Compare approval required for hardware purchase vs software license purchase",
+    "expected_keywords": ["Department Head", "IT & Finance", "1500", "5000"],
+    "target_domain": "Finance"
+  },
+  {
+    "id": "q_fin_06",
+    "type": "Procedural",
+    "query": "What expenses trigger an internal audit review prior to payout?",
+    "expected_keywords": ["1000", "audit review", "10 business days"],
+    "target_domain": "Finance"
+  },
+  {
+    "id": "q_fin_07",
+    "type": "Unavailable",
+    "query": "What is the reimbursement policy for Tesla company cars?",
+    "expected_keywords": [],
+    "target_domain": "Finance"
+  }
+]
