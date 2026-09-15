@@ -433,6 +433,14 @@ textarea#user-query-input:focus {
     display: none !important;
 }
 
+.m2-badges-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
 .answer-box {
     background: rgba(11, 15, 30, 0.9);
     border: 1px solid var(--border-highlight);

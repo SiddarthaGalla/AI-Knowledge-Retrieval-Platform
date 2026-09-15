@@ -322,12 +322,27 @@ function initQueryAndSpeechModule() {
                 currentResponseText = payload.response_text;
 
                 responseTextBody.textContent = payload.response_text;
-                confidenceBadge.textContent = `Confidence: ${(payload.confidence_score * 100).toFixed(1)}%`;
                 
-                if (payload.confidence_score >= 0.75) {
-                    confidenceBadge.className = 'badge badge-success';
-                } else if (payload.confidence_score >= 0.65) {
-                    confidenceBadge.className = 'badge badge-warning';
+                // M2 Badge Updates
+                const qTypeBadge = document.getElementById('query-type-badge');
+                const routeBadge = document.getElementById('routing-path-badge');
+                const confLevelBadge = document.getElementById('confidence-level-badge');
+                
+                if (qTypeBadge) {
+                    qTypeBadge.innerHTML = `<i class="fa-solid fa-tag"></i> Type: ${(payload.query_type || 'Factual').toUpperCase()}`;
+                    qTypeBadge.className = 'badge badge-primary';
+                }
+                if (routeBadge) {
+                    const routeName = payload.routing_path === 'clarification_flow' ? 'Clarification Flow' : 'Retrieval Flow';
+                    routeBadge.innerHTML = `<i class="fa-solid fa-route"></i> Route: ${routeName}`;
+                    routeBadge.className = payload.routing_path === 'clarification_flow' ? 'badge badge-warning' : 'badge badge-info';
+                }
+                if (confLevelBadge) {
+                    const levelStr = payload.confidence_level || 'HIGH CONFIDENCE';
+                    confLevelBadge.innerHTML = `<i class="fa-solid fa-shield"></i> ${levelStr} (${(payload.confidence_score * 100).toFixed(1)}%)`;
+                    if (levelStr.includes('HIGH')) confLevelBadge.className = 'badge badge-success';
+                    else if (levelStr.includes('MEDIUM')) confLevelBadge.className = 'badge badge-warning';
+                    else confLevelBadge.className = 'badge badge-danger';
                 } else {
                     confidenceBadge.className = 'badge badge-danger';
                 }

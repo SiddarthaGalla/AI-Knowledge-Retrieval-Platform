@@ -128,6 +128,13 @@
 
                     <!-- Live Query Output Container -->
                     <div id="query-output-section" class="output-section hidden">
+                        <!-- M2 Meta Badges Bar -->
+                        <div class="m2-badges-bar">
+                            <span id="query-type-badge" class="badge badge-primary"><i class="fa-solid fa-tag"></i> Type: --</span>
+                            <span id="routing-path-badge" class="badge badge-info"><i class="fa-solid fa-route"></i> Route: --</span>
+                            <span id="confidence-level-badge" class="badge badge-success"><i class="fa-solid fa-shield"></i> Confidence: --</span>
+                        </div>
+
                         <!-- Answer Banner -->
                         <div class="answer-box">
                             <div class="answer-header">
@@ -138,7 +145,6 @@
                                     <button id="btn-tts" class="btn btn-secondary btn-sm" title="Speak Response (Text-to-Speech)">
                                         <i class="fa-solid fa-volume-high"></i> Listen Answer
                                     </button>
-                                    <span id="confidence-badge" class="badge badge-success">Confidence: --</span>
                                 </div>
                             </div>
                             <div id="response-text-body" class="answer-body">

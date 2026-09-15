@@ -12,6 +12,7 @@ ENV/
 # Vector Stores & Dynamic Uploads
 data/vector_store/
 data/vector_store_eval/
+data/vector_store_m2_test/
 data/uploads/
 
 # IDE & Logs

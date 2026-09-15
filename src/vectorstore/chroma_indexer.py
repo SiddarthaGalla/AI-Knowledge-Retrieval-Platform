@@ -87,10 +87,11 @@ class VectorStoreManager:
             score = float(np.dot(query_emb, emb))
             # Also calculate keyword match boost for domain accuracy
             content_lower = chunk["content"].lower()
-            query_terms = [t for t in query.lower().split() if len(t) > 2]
+            stop_words = {"what", "where", "when", "which", "how", "this", "that", "with", "from", "for", "the", "and", "are", "is", "a", "an", "in", "of", "or", "to", "does"}
+            query_terms = [t.strip("?,.") for t in query.lower().split() if len(t.strip("?,.")) > 2 and t.strip("?,.") not in stop_words]
             match_count = sum(1 for term in query_terms if term in content_lower)
             if query_terms and match_count > 0:
-                keyword_boost = 0.15 * (match_count / len(query_terms))
+                keyword_boost = 0.35 * (match_count / len(query_terms))
                 score = min(1.0, score + keyword_boost)
                 
             results.append({
