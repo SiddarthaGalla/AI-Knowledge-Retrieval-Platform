@@ -1,8 +1,8 @@
 Policy_ID,Category,Policy_Name,Daily_Limit_USD,Approval_Required,Submission_Deadline_Days,Rules_Summary
-FIN-001,Travel & Expenses,Domestic Lodging Allowance,250,Manager Approval,30,Maximum allowed per night for hotel accommodation in Tier 1 cities. Original receipt mandatory.
-FIN-002,Travel & Expenses,Daily Per Diem Meal Allowance,75,Self-Certification,30,Covers breakfast ($15), lunch ($25), and dinner ($35). No itemized meal receipts required under $75.
-FIN-003,Travel & Expenses,Airfare Booking Standard,1200,VP Approval over $1200,14,Economy class mandatory for domestic flights under 6 hours. Business class allowed for flights exceeding 8 hours with SVP approval.
-FIN-004,Procurement,Software License Purchase,5000,IT & Finance Approval,15,All software purchases must be vetted by IT Security before invoice submission.
-FIN-005,Procurement,Hardware Purchase Allowance,1500,Department Head Approval,30,Standard laptop and monitor upgrades allowed every 3 years per full-time employee.
-FIN-006,Compliance,Corporate Gift Acceptance Limit,100,Compliance Officer Approval,7,Gifts from vendors exceeding $100 must be declared or declined per anti-bribery regulations.
-FIN-007,Audit & Finance,Expense Reimbursement Audit Threshold,1000,Internal Audit Review,45,Claims exceeding $1000 undergo random audit verification prior to payout. Payout processed within 10 business days.
+FIN-001,Travel & Expenses,Domestic Lodging Allowance,250,Manager Approval,30,"Maximum allowed per night for hotel accommodation in Tier 1 cities. Original receipt mandatory."
+FIN-002,Travel & Expenses,Daily Per Diem Meal Allowance,75,Self-Certification,30,"Covers breakfast ($15), lunch ($25), and dinner ($35). No itemized meal receipts required under $75."
+FIN-003,Travel & Expenses,Airfare Booking Standard,1200,"VP Approval over $1200",14,"Economy class mandatory for domestic flights under 6 hours. Business class allowed for flights exceeding 8 hours with SVP approval."
+FIN-004,Procurement,Software License Purchase,5000,"IT & Finance Approval",15,"All software purchases must be vetted by IT Security before invoice submission."
+FIN-005,Procurement,Hardware Purchase Allowance,1500,Department Head Approval,30,"Standard laptop and monitor upgrades allowed every 3 years per full-time employee."
+FIN-006,Compliance,Corporate Gift Acceptance Limit,100,Compliance Officer Approval,7,"Gifts from vendors exceeding $100 must be declared or declined per anti-bribery regulations."
+FIN-007,Audit & Finance,Expense Reimbursement Audit Threshold,1000,Internal Audit Review,45,"Claims exceeding $1000 undergo random audit verification prior to payout. Payout processed within 10 business days."

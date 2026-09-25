@@ -147,6 +147,11 @@ async def delete_document(doc_id: str):
         raise HTTPException(status_code=404, detail="Document not found.")
     return {"status": "success", "message": f"Deleted document {doc_id}"}
 
+class RefineQueryRequest(BaseModel):
+    session_id: str
+    clarification_response: str
+    domain_filter: Optional[str] = "all"
+
 @app.post("/api/query")
 async def execute_query(payload: QueryRequest):
     """
@@ -168,6 +173,44 @@ async def execute_query(payload: QueryRequest):
     except Exception as e:
         logger.error(f"Query resolution error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
+
+@app.post("/api/query/refine")
+async def refine_query(payload: RefineQueryRequest):
+    """
+    Refines an ambiguous/multi-part query using clarification feedback (M3.1).
+    """
+    if not payload.clarification_response or not payload.clarification_response.strip():
+        raise HTTPException(status_code=400, detail="Clarification response cannot be empty.")
+        
+    try:
+        result = orchestrator.run_refinement(
+            session_id=payload.session_id,
+            clarification_response=payload.clarification_response,
+            domain_filter=payload.domain_filter
+        )
+        return {
+            "status": "success",
+            "data": result
+        }
+    except Exception as e:
+        logger.error(f"Query refinement error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Query refinement failed: {str(e)}")
+
+@app.get("/api/session/{session_id}")
+async def get_session_memory(session_id: str):
+    """
+    Returns session history logs and tracked entities (M3.2).
+    """
+    history = orchestrator.memory_agent.get_history(session_id)
+    entities = orchestrator.memory_agent.session_entities.get(session_id, [])
+    docs = orchestrator.memory_agent.session_docs.get(session_id, [])
+    return {
+        "status": "success",
+        "session_id": session_id,
+        "history": history,
+        "tracked_entities": entities,
+        "tracked_documents": docs
+    }
 
 @app.post("/api/evaluate")
 async def run_evaluation_benchmark():

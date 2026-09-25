@@ -1,7 +1,7 @@
 /**
- * CogniRetrieve.ai - Client Application Logic
+ * CogniRetrieve.ai - Client Application Logic (Milestone 3 Complete)
  * Supports Multi-Agent RAG Orchestration, Document Ingestion, Web Speech API (STT & TTS),
- * and Multi-Domain Retrieval Evaluation.
+ * Clarification Feedback Loop, Coreference Memory Tracking, and Response Transparency Panel.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -193,7 +193,7 @@ function initIngestionModule() {
 }
 
 /* ==========================================================================
-   4. MULTI-AGENT QUERY & WEB SPEECH API MODULE (STT & TTS)
+   4. MULTI-AGENT QUERY, WEB SPEECH API (STT & TTS) & M3 TRANSPARENCY MODULE
    ========================================================================== */
 function initQueryAndSpeechModule() {
     const queryInput = document.getElementById('user-query-input');
@@ -201,15 +201,32 @@ function initQueryAndSpeechModule() {
     const btnClear = document.getElementById('btn-clear-query');
     const btnStt = document.getElementById('btn-stt');
     const sttStatus = document.getElementById('stt-status');
+    
+    // M3.3 TTS Controls
     const btnTts = document.getElementById('btn-tts');
+    const btnTtsPause = document.getElementById('btn-tts-pause');
+    const btnTtsResume = document.getElementById('btn-tts-resume');
+    const btnTtsStop = document.getElementById('btn-tts-stop');
+
+    // M3.1 Clarification Controls
+    const clarificationBar = document.getElementById('clarification-bar');
+    const clarificationMsg = document.getElementById('clarification-message');
+    const suggestedPillsContainer = document.getElementById('suggested-questions-pills');
+    const refineQueryInput = document.getElementById('refine-query-input');
+    const btnSubmitRefinement = document.getElementById('btn-submit-refinement');
+
     const outputSection = document.getElementById('query-output-section');
     const responseTextBody = document.getElementById('response-text-body');
-    const confidenceBadge = document.getElementById('confidence-badge');
     const citationsContainer = document.getElementById('citations-container');
+    const evidenceCountBadge = document.getElementById('evidence-count-badge');
+    const transparencyContent = document.getElementById('transparency-content');
 
     let currentResponseText = '';
+    let currentSessionId = 'web_session_01';
 
+    // ----------------------------------------------------------------------
     // Web Speech API - Speech-to-Text (STT) Setup
+    // ----------------------------------------------------------------------
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
@@ -241,9 +258,7 @@ function initQueryAndSpeechModule() {
             sttStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Mic Error: ${event.error}`;
         };
 
-        recognition.onend = () => {
-            stopSTT();
-        };
+        recognition.onend = () => stopSTT();
 
         btnStt.addEventListener('click', () => {
             if (isListening) {
@@ -268,33 +283,89 @@ function initQueryAndSpeechModule() {
         sttStatus.innerHTML = '<i class="fa-solid fa-microphone"></i> Mic Ready';
     }
 
-    // Web Speech API - Text-to-Speech (TTS) Setup
-    btnTts.addEventListener('click', () => {
+    // ----------------------------------------------------------------------
+    // Web Speech API - Text-to-Speech (TTS) Setup (M3.3)
+    // ----------------------------------------------------------------------
+    btnTts?.addEventListener('click', () => {
         if (!currentResponseText) return;
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Stop any ongoing speech
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(currentResponseText);
             utterance.rate = 1.0;
             utterance.pitch = 1.0;
+            
+            utterance.onstart = () => {
+                btnTts.classList.add('hidden');
+                btnTtsPause.classList.remove('hidden');
+                btnTtsStop.classList.remove('hidden');
+            };
+            
+            utterance.onend = () => resetTTSButtons();
+            utterance.onerror = () => resetTTSButtons();
+
             window.speechSynthesis.speak(utterance);
         } else {
             alert('Text-to-Speech is not supported in your browser.');
         }
     });
 
-    // Query Submission
-    btnSubmit?.addEventListener('click', handleQuerySubmit);
+    btnTtsPause?.addEventListener('click', () => {
+        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+            window.speechSynthesis.pause();
+            btnTtsPause.classList.add('hidden');
+            btnTtsResume.classList.remove('hidden');
+        }
+    });
+
+    btnTtsResume?.addEventListener('click', () => {
+        if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+            btnTtsResume.classList.add('hidden');
+            btnTtsPause.classList.remove('hidden');
+        }
+    });
+
+    btnTtsStop?.addEventListener('click', () => {
+        window.speechSynthesis.cancel();
+        resetTTSButtons();
+    });
+
+    function resetTTSButtons() {
+        btnTts.classList.remove('hidden');
+        btnTtsPause.classList.add('hidden');
+        btnTtsResume.classList.add('hidden');
+        btnTtsStop.classList.add('hidden');
+    }
+
+    // ----------------------------------------------------------------------
+    // Query Submission & Refinement Handlers
+    // ----------------------------------------------------------------------
+    btnSubmit?.addEventListener('click', () => handleQuerySubmit(false));
+    btnSubmitRefinement?.addEventListener('click', () => handleQuerySubmit(true));
+
     btnClear?.addEventListener('click', () => {
         queryInput.value = '';
         outputSection.classList.add('hidden');
+        clarificationBar.classList.add('hidden');
+        window.speechSynthesis.cancel();
+        resetTTSButtons();
         resetTimeline();
     });
 
-    async function handleQuerySubmit() {
-        const query = queryInput.value.strip ? queryInput.value.strip() : queryInput.value.trim();
-        if (!query) {
-            alert('Please enter a query.');
-            return;
+    async function handleQuerySubmit(isRefinement = false) {
+        let query = '';
+        if (isRefinement) {
+            query = refineQueryInput.value.trim();
+            if (!query) {
+                alert('Please enter a clarification refinement.');
+                return;
+            }
+        } else {
+            query = queryInput.value.trim();
+            if (!query) {
+                alert('Please enter a query.');
+                return;
+            }
         }
 
         const domainFilter = document.getElementById('domain-filter-select')?.value || 'all';
@@ -302,18 +373,28 @@ function initQueryAndSpeechModule() {
         outputSection.classList.remove('hidden');
         responseTextBody.textContent = 'Executing 5-Agent Pipeline...';
         citationsContainer.innerHTML = '';
+        clarificationBar.classList.add('hidden');
+        window.speechSynthesis.cancel();
+        resetTTSButtons();
 
         animateTimeline();
 
         try {
-            const res = await fetch('/api/query', {
+            const endpoint = isRefinement ? '/api/query/refine' : '/api/query';
+            const bodyPayload = isRefinement ? {
+                session_id: currentSessionId,
+                clarification_response: query,
+                domain_filter: domainFilter
+            } : {
+                query: query,
+                session_id: currentSessionId,
+                domain_filter: domainFilter
+            };
+
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    query: query,
-                    session_id: 'web_session_01',
-                    domain_filter: domainFilter
-                })
+                body: JSON.stringify(bodyPayload)
             });
 
             const data = await res.json();
@@ -323,7 +404,7 @@ function initQueryAndSpeechModule() {
 
                 responseTextBody.textContent = payload.response_text;
                 
-                // M2 Badge Updates
+                // M2/M3 Badge Updates
                 const qTypeBadge = document.getElementById('query-type-badge');
                 const routeBadge = document.getElementById('routing-path-badge');
                 const confLevelBadge = document.getElementById('confidence-level-badge');
@@ -343,8 +424,24 @@ function initQueryAndSpeechModule() {
                     if (levelStr.includes('HIGH')) confLevelBadge.className = 'badge badge-success';
                     else if (levelStr.includes('MEDIUM')) confLevelBadge.className = 'badge badge-warning';
                     else confLevelBadge.className = 'badge badge-danger';
-                } else {
-                    confidenceBadge.className = 'badge badge-danger';
+                }
+
+                // M3.1 Clarification Bar Activation
+                if (payload.clarification_required) {
+                    clarificationBar.classList.remove('hidden');
+                    clarificationMsg.textContent = payload.clarification_message || 'Please refine your question.';
+                    refineQueryInput.value = '';
+
+                    // Suggested question pills
+                    if (payload.suggested_questions && payload.suggested_questions.length > 0) {
+                        suggestedPillsContainer.innerHTML = payload.suggested_questions.map(sq => `
+                            <span class="suggestion-pill" onclick="selectSuggestion('${escapeHtml(sq)}')">
+                                <i class="fa-solid fa-lightbulb"></i> ${escapeHtml(sq)}
+                            </span>
+                        `).join('');
+                    } else {
+                        suggestedPillsContainer.innerHTML = '';
+                    }
                 }
 
                 // Render Citations
@@ -362,6 +459,9 @@ function initQueryAndSpeechModule() {
                     citationsContainer.innerHTML = '<span style="font-size:0.85rem; color:#94a3b8;">No direct citations (General or Clarification Prompt).</span>';
                 }
 
+                // M3.4 Response Transparency Panel Evidence Inspector
+                renderTransparencyPanel(payload.retrieved_chunks || []);
+
                 completeTimeline(payload.agent_execution_log);
             } else {
                 responseTextBody.textContent = `Error: ${data.detail || 'Failed to process query.'}`;
@@ -370,14 +470,56 @@ function initQueryAndSpeechModule() {
             responseTextBody.textContent = `Error executing query: ${err.message}`;
         }
     }
+
+    // Helper for selecting suggestion pills
+    window.selectSuggestion = function(text) {
+        refineQueryInput.value = text;
+        handleQuerySubmit(true);
+    };
+
+    // M3.4 Response Transparency Panel Evidence Rendering
+    function renderTransparencyPanel(chunks) {
+        evidenceCountBadge.textContent = `${chunks.length} Evidence Chunk${chunks.length === 1 ? '' : 's'}`;
+        if (!chunks || chunks.length === 0) {
+            transparencyContent.innerHTML = '<p class="text-dim">No supporting evidence chunks were retrieved or score was below threshold.</p>';
+            return;
+        }
+
+        transparencyContent.innerHTML = `
+            <div class="evidence-chunks-list">
+                ${chunks.map((c, idx) => {
+                    const scorePct = (c.similarity_score * 100).toFixed(1);
+                    const meta = c.metadata || {};
+                    return `
+                        <div class="evidence-chunk-card">
+                            <div class="evidence-meta-row">
+                                <div>
+                                    <span class="badge badge-primary">Chunk ${idx + 1}</span>
+                                    <strong style="margin-left:6px;">${escapeHtml(meta.file_name || 'Document')}</strong>
+                                    <span style="color:#94a3b8; font-size:0.775rem;"> | Section: ${escapeHtml(meta.section || 'General')} (Page/Row ${meta.page_number || 1})</span>
+                                </div>
+                                <div class="similarity-meter-wrap">
+                                    <span>Relevance: <strong>${scorePct}%</strong></span>
+                                    <div class="meter-bg">
+                                        <div class="meter-fill" style="width: ${Math.min(100, Math.max(10, scorePct))}%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chunk-text-box">${escapeHtml(c.content || '')}</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
 }
 
 /* ==========================================================================
-   5-AGENT TIMELINE ANIMATION
+   5. TIMELINE ANIMATION & STEPPER
    ========================================================================== */
 function animateTimeline() {
     const steps = ['step-qua', 'step-ret', 'step-clar', 'step-resp', 'step-mem'];
-    steps.forEach((s, idx) => {
+    steps.forEach(s => {
         const el = document.getElementById(s);
         if (el) {
             el.classList.add('active');
@@ -416,7 +558,7 @@ function resetTimeline() {
 }
 
 /* ==========================================================================
-   5. RETRIEVAL EVALUATION MODULE
+   6. RETRIEVAL EVALUATION MODULE
    ========================================================================== */
 function initEvaluationModule() {
     const btnRunEval = document.getElementById('btn-run-eval');

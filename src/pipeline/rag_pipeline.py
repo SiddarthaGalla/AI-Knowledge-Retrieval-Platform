@@ -12,10 +12,9 @@ logger = logging.getLogger(__name__)
 
 class RAGPipelineOrchestrator:
     """
-    Multi-Agent Orchestration Layer (M2.4)
-    Coordinates sequential execution flow:
-    User Query -> Query Understanding -> Retrieval -> Clarification -> Response Generation -> Memory.
-    Establishes standardized inter-agent payloads and error handling.
+    Stateful 5-Agent RAG Pipeline Orchestrator (Milestone 3)
+    Coordinates sequential agent flow, multi-turn memory coreference resolution,
+    and clarification query refinement loops.
     """
     def __init__(self, vector_store: VectorStoreManager):
         self.vector_store = vector_store
@@ -35,8 +34,18 @@ class RAGPipelineOrchestrator:
         agent_execution_log = []
 
         try:
-            # 1. Query Understanding Agent (M2.1)
-            qua_res = self.qua_agent.process(user_query)
+            # 0. M3.2 Coreference Resolution (pronouns -> recent entities)
+            resolved_query = self.memory_agent.resolve_coreference(user_query, session_id)
+            if resolved_query != user_query:
+                agent_execution_log.append({
+                    "step": 0,
+                    "agent": "Conversation Memory Agent",
+                    "details": f"Coreference Resolved: '{user_query}' -> '{resolved_query}'",
+                    "data": {"original": user_query, "resolved": resolved_query}
+                })
+
+            # 1. Query Understanding Agent (M2.1 & M3.1)
+            qua_res = self.qua_agent.process(resolved_query)
             agent_execution_log.append({
                 "step": 1,
                 "agent": "Query Understanding Agent",
@@ -53,7 +62,7 @@ class RAGPipelineOrchestrator:
                 "data": ret_res
             })
 
-            # 3. Clarification Agent (Safety & Threshold Evaluator)
+            # 3. Clarification Agent (M3.1)
             clar_res = self.clarification_agent.process(qua_res, ret_res)
             agent_execution_log.append({
                 "step": 3,
@@ -62,7 +71,7 @@ class RAGPipelineOrchestrator:
                 "data": clar_res
             })
 
-            # 4. Response Generation Agent (M2.3)
+            # 4. Response Generation Agent (M2.3 & M3.4)
             resp_res = self.response_agent.process(user_query, qua_res, ret_res, clar_res)
             agent_execution_log.append({
                 "step": 4,
@@ -71,12 +80,12 @@ class RAGPipelineOrchestrator:
                 "data": resp_res
             })
 
-            # 5. Conversation Memory Agent
-            mem_res = self.memory_agent.process(session_id, user_query, resp_res)
+            # 5. Conversation Memory Agent (M3.2)
+            mem_res = self.memory_agent.process(session_id, user_query, resp_res, qua_res)
             agent_execution_log.append({
                 "step": 5,
                 "agent": "Conversation Memory Agent",
-                "details": f"Session: {session_id} | Memory Turns: {mem_res['total_turns']}",
+                "details": f"Session: {session_id} | Total Session Turns: {mem_res['total_turns']}",
                 "data": mem_res
             })
 
@@ -84,6 +93,7 @@ class RAGPipelineOrchestrator:
 
             return {
                 "user_query": user_query,
+                "resolved_query": resolved_query,
                 "session_id": session_id,
                 "query_type": qua_res["query_type"],
                 "classification_confidence": qua_res["classification_confidence"],
@@ -94,6 +104,8 @@ class RAGPipelineOrchestrator:
                 "citations": resp_res["citations"],
                 "clarification_required": clar_res["clarification_required"],
                 "clarification_message": clar_res.get("message") if clar_res["clarification_required"] else None,
+                "suggested_questions": clar_res.get("suggested_questions", []),
+                "multi_parts": clar_res.get("multi_parts", []),
                 "execution_time_ms": elapsed_ms,
                 "agent_execution_log": agent_execution_log,
                 "retrieved_chunks": ret_res["top_k_chunks"]
@@ -102,6 +114,7 @@ class RAGPipelineOrchestrator:
             logger.error(f"Orchestrator error: {e}", exc_info=True)
             return {
                 "user_query": user_query,
+                "resolved_query": user_query,
                 "session_id": session_id,
                 "query_type": "error",
                 "classification_confidence": 0.0,
@@ -115,3 +128,21 @@ class RAGPipelineOrchestrator:
                 "agent_execution_log": agent_execution_log,
                 "retrieved_chunks": []
             }
+
+    def run_refinement(
+        self, 
+        session_id: str, 
+        clarification_response: str,
+        domain_filter: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Processes user clarification feedback loop by combining original pending query
+        with user's clarification response (M3.1).
+        """
+        last_turn = self.memory_agent.get_last_turn(session_id)
+        original_query = last_turn.get("user_query", "") if last_turn else ""
+        
+        refined_query = self.clarification_agent.combine_and_refine(original_query, clarification_response)
+        logger.info(f"Refined Query for session {session_id}: '{refined_query}'")
+        
+        return self.run_query(user_query=refined_query, session_id=session_id, domain_filter=domain_filter)

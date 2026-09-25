@@ -128,11 +128,27 @@
 
                     <!-- Live Query Output Container -->
                     <div id="query-output-section" class="output-section hidden">
-                        <!-- M2 Meta Badges Bar -->
+                        <!-- M2/M3 Meta Badges Bar -->
                         <div class="m2-badges-bar">
                             <span id="query-type-badge" class="badge badge-primary"><i class="fa-solid fa-tag"></i> Type: --</span>
                             <span id="routing-path-badge" class="badge badge-info"><i class="fa-solid fa-route"></i> Route: --</span>
                             <span id="confidence-level-badge" class="badge badge-success"><i class="fa-solid fa-shield"></i> Confidence: --</span>
+                        </div>
+
+                        <!-- M3.1 Clarification Response / Refinement Bar -->
+                        <div id="clarification-bar" class="clarification-card hidden">
+                            <div class="clarification-header">
+                                <i class="fa-solid fa-circle-question"></i>
+                                <span>Clarification Requested</span>
+                            </div>
+                            <p id="clarification-message">Question needs refinement.</p>
+                            <div id="suggested-questions-pills" class="suggestions-grid"></div>
+                            <div class="refine-input-row">
+                                <input type="text" id="refine-query-input" placeholder="Type your refinement or click a suggested question above..." class="custom-input">
+                                <button id="btn-submit-refinement" class="btn btn-primary btn-sm">
+                                    <i class="fa-solid fa-paper-plane"></i> Submit Refinement
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Answer Banner -->
@@ -141,9 +157,19 @@
                                 <div class="answer-title">
                                     <i class="fa-solid fa-sparkles"></i> Synthesized Grounded Response
                                 </div>
-                                <div class="answer-tools">
-                                    <button id="btn-tts" class="btn btn-secondary btn-sm" title="Speak Response (Text-to-Speech)">
-                                        <i class="fa-solid fa-volume-high"></i> Listen Answer
+                                <!-- M3.3 Voice TTS Toolbar -->
+                                <div class="tts-toolbar">
+                                    <button id="btn-tts" class="btn btn-secondary btn-sm" title="Play Response (Text-to-Speech)">
+                                        <i class="fa-solid fa-volume-high"></i> Play Voice
+                                    </button>
+                                    <button id="btn-tts-pause" class="btn btn-secondary btn-sm hidden" title="Pause Speech">
+                                        <i class="fa-solid fa-pause"></i> Pause
+                                    </button>
+                                    <button id="btn-tts-resume" class="btn btn-secondary btn-sm hidden" title="Resume Speech">
+                                        <i class="fa-solid fa-play"></i> Resume
+                                    </button>
+                                    <button id="btn-tts-stop" class="btn btn-secondary btn-sm hidden" title="Stop Speech">
+                                        <i class="fa-solid fa-stop"></i> Stop
                                     </button>
                                 </div>
                             </div>
@@ -158,6 +184,19 @@
                             <div id="citations-container" class="citations-grid">
                                 <!-- Citation Pills -->
                             </div>
+                        </div>
+
+                        <!-- M3.4 Response Transparency Panel -->
+                        <div class="transparency-section">
+                            <details class="transparency-accordion" id="transparency-accordion">
+                                <summary class="transparency-summary">
+                                    <i class="fa-solid fa-magnifying-glass-location"></i> Inspect Evidence & Source Transparency Panel
+                                    <span class="badge badge-info" id="evidence-count-badge">0 Chunks</span>
+                                </summary>
+                                <div class="transparency-content" id="transparency-content">
+                                    <p class="text-dim">No evidence inspected yet.</p>
+                                </div>
+                            </details>
                         </div>
                     </div>
                 </div>

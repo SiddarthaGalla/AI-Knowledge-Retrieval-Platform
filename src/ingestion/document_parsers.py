@@ -187,7 +187,10 @@ class DocumentParser:
         try:
             records = []
             if pd is not None:
-                df = pd.read_csv(file_path)
+                try:
+                    df = pd.read_csv(file_path)
+                except Exception:
+                    df = pd.read_csv(file_path, on_bad_lines='skip')
                 records = df.to_dict(orient="records")
             else:
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
