@@ -53,28 +53,18 @@ class ClarificationAgent:
                 "clarification_required": True,
                 "confidence_score": max_score,
                 "reason": "ambiguous_query",
-                "message": query_analysis.get("routing_reason") or "Your question is underspecified. Please clarify the specific policy or entity you are asking about.",
+                "message": query_analysis.get("routing_reason") or "Your question is underspecified. Please clarify the specific topic or entity you are asking about.",
                 "suggested_questions": suggested_questions,
                 "status": "triggered"
             }
-            
-        # 4. Low confidence check (< 0.30)
-        if max_score < self.confidence_threshold or not chunks:
-            return {
-                "agent_name": "Clarification Agent",
-                "clarification_required": True,
-                "confidence_score": max_score,
-                "reason": "low_confidence",
-                "message": f"I couldn't find a high-confidence match (Confidence: {max_score:.2f} < Threshold: {self.confidence_threshold:.2f}). Could you please clarify your question or specify the relevant policy section?",
-                "status": "triggered"
-            }
-            
+
+        # 4. Check confidence score - mark low confidence indicator but allow response synthesis
         return {
             "agent_name": "Clarification Agent",
             "clarification_required": False,
             "confidence_score": max_score,
-            "reason": "sufficient_confidence",
-            "message": "Confidence threshold satisfied.",
+            "reason": "sufficient_confidence" if max_score >= self.confidence_threshold else "low_confidence_general_synthesis",
+            "message": "Confidence threshold satisfied." if max_score >= self.confidence_threshold else "Low vector match - generating synthesized answer.",
             "status": "passed"
         }
 

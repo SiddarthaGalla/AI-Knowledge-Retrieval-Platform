@@ -52,14 +52,15 @@ class QueryRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     logger.info("Initializing AI Knowledge Retrieval Platform Gateway...")
-    # Pre-seed evaluation datasets if vector store is empty
-    stats = vector_store.get_stats()
-    if stats["total_documents"] == 0:
-        logger.info("Vector store is empty. Pre-seeding Healthcare & Finance sample datasets...")
-        try:
-            eval_runner.prepare_sample_datasets()
-        except Exception as e:
-            logger.warning(f"Pre-seeding warning: {e}")
+    # Pre-seed and refresh Healthcare & Finance sample datasets
+    try:
+        logger.info("Ensuring Healthcare & Finance sample datasets are indexed and ready...")
+        eval_runner.prepare_sample_datasets()
+        stats = vector_store.get_stats()
+        logger.info(f"Vector Store initialized: {stats['total_documents']} documents, {stats['total_chunks']} chunks indexed.")
+    except Exception as e:
+        logger.warning(f"Pre-seeding warning: {e}")
+
 
 # Static directory setup
 static_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")

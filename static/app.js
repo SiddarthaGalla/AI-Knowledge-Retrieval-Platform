@@ -77,6 +77,21 @@ async function fetchDocuments() {
                 return;
             }
 
+            // Dynamic Domain Sync for Filter Dropdown
+            const filterSelect = document.getElementById('domain-filter-select');
+            if (filterSelect) {
+                const existingValues = Array.from(filterSelect.options).map(o => o.value);
+                docs.forEach(doc => {
+                    if (doc.domain && !existingValues.includes(doc.domain)) {
+                        const opt = document.createElement('option');
+                        opt.value = doc.domain;
+                        opt.textContent = `${doc.domain} (Indexed)`;
+                        filterSelect.appendChild(opt);
+                        existingValues.push(doc.domain);
+                    }
+                });
+            }
+
             tbody.innerHTML = docs.map(doc => `
                 <tr>
                     <td><code>${doc.document_id}</code></td>

@@ -1,0 +1,15 @@
+====================================================================
+ENTERPRISE IT SECURITY & DATA PRIVACY POLICY (POLICY 2026-IT)
+====================================================================
+
+SECTION 1: PASSWORD STANDARDS & MULTI-FACTOR AUTHENTICATION
+All corporate accounts require passwords with a minimum length of 14 characters, incorporating upper and lower case letters, numbers, and special symbols. Passwords expire every 90 days. Multi-Factor Authentication (MFA) via authenticator app is mandatory for accessing any internal network resource or cloud portal.
+
+SECTION 2: REMOTE WORK & VPN ACCESS REQUIREMENTS
+Employees working remotely must connect to the corporate network via the encrypted SSL-VPN. Accessing company infrastructure from public Wi-Fi networks without an active VPN session is strictly prohibited. Remote devices must have auto-lock enabled after 5 minutes of inactivity.
+
+SECTION 3: DATA CLASSIFICATION & CONFIDENTIALITY
+Corporate data is classified into three tiers: Public, Internal, and Restricted. Financial records, employee PII, and customer data are classified as Restricted. Transmitting Restricted data via unencrypted email or external messaging platforms is a severe compliance violation.
+
+SECTION 4: INCIDENT REPORTING & THREAT RESPONSE
+Any suspected security breach, phishing email attempt, or compromised account must be reported to the IT Security Operations Center (SOC) within 1 hour of detection. Employees can report threats using the 'Report Phish' button in Outlook or by emailing security@company.com.

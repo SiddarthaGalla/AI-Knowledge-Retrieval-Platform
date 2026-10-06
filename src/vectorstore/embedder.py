@@ -6,6 +6,8 @@ from typing import List
 
 logger = logging.getLogger(__name__)
 
+import zlib
+
 class EmbeddingGenerator:
     """
     Handles text embedding generation using SentenceTransformers, OpenAI/Gemini, or local fallback.
@@ -44,20 +46,22 @@ class EmbeddingGenerator:
     def _fallback_embed(self, text: str, dim: int = 384) -> List[float]:
         """
         Creates normalized semantic n-gram hashed feature vector for text matching.
+        Uses zlib.crc32 for deterministic hashing across Python process restarts.
         """
         vec = np.zeros(dim, dtype=np.float32)
         words = text.lower().split()
         for i, word in enumerate(words):
             # Uni-gram hash
-            h1 = abs(hash(word)) % dim
+            h1 = zlib.crc32(word.encode('utf-8')) % dim
             vec[h1] += 1.0
             # Bi-gram hash
             if i > 0:
                 bigram = f"{words[i-1]}_{word}"
-                h2 = abs(hash(bigram)) % dim
+                h2 = zlib.crc32(bigram.encode('utf-8')) % dim
                 vec[h2] += 1.5
                 
         norm = np.linalg.norm(vec)
         if norm > 0:
             vec = vec / norm
         return vec.tolist()
+

@@ -1,0 +1,159 @@
+================================================================================
+WEB APPLICATION USER GUIDE & FEATURE MANUAL
+AI-Based Knowledge Retrieval Platform
+================================================================================
+
+--------------------------------------------------------------------------------
+🚀 SECTION 1: HOW TO LAUNCH AND OPEN THE WEB APP
+--------------------------------------------------------------------------------
+1. Open your terminal in the project directory:
+   Path: s:\Personal\My Projects\AI-Knowledge-Retrieval-Platform
+
+2. Start the FastAPI Application Gateway Server:
+   Command: python main.py
+
+3. Open your Web Browser (Chrome, Edge, Firefox):
+   URL: http://localhost:8000
+
+
+================================================================================
+SECTION 2: COMPLETE WALKTHROUGH OF WEB APP UI LAYOUT & FEATURES
+================================================================================
+
+🌐 FEATURE 1: NAVIGATION HEADER & PLATFORM METRICS BAR
+- Brand Logo & Gateway Status: Shows "CogniRetrieve.ai" with a glowing green "Gateway Active" pulse dot.
+- Top Stats Bar:
+  * Ingested Documents: Shows total files loaded into the knowledge base.
+  * Indexed Chunks: Shows total text chunks generated for vector search.
+  * Top-3 Retrieval Accuracy: Shows platform accuracy baseline (92.3%).
+  * Web Speech Status: Shows "STT & TTS Enabled".
+
+
+💬 FEATURE 2: RAG & VOICE QUERY PANEL (TAB 1)
+- Domain Filter Dropdown: Select to search across "All Domains", "Healthcare Domain", "Finance Domain", or "General".
+- Text Query Box: Type any question into the search box and click "Submit Query".
+- Voice STT (Speech-to-Text) Microphone Button:
+  * Click the Microphone icon next to the textarea.
+  * Speak your question into your microphone.
+  * Your spoken words are automatically transcribed into text inside the box.
+- 5-Agent Workflow Stepper: Real-time visual timeline showing progress as each AI agent executes:
+  1. Query Understanding Agent: Classifies intent & expands search terms.
+  2. Retrieval Agent: Searches vector database for matching chunks.
+  3. Clarification Agent: Evaluates confidence threshold (> 0.30).
+  4. Response Generation Agent: Synthesizes grounded answer with citations.
+  5. Conversation Memory Agent: Logs turn history & tracks entities.
+- Query Classification & Confidence Badges:
+  * Query Type Badge: Displays FACTUAL, PROCEDURAL, COMPARATIVE, or AMBIGUOUS.
+  * Routing Path Badge: Displays Retrieval Flow vs Clarification Flow.
+  * Application Confidence Badge: Displays HIGH CONFIDENCE, MEDIUM CONFIDENCE, or LOW CONFIDENCE with percentage score.
+- Synthesized Grounded Response Box: Displays clear, formatted AI response.
+- Voice TTS (Text-to-Speech) Audio Toolbar:
+  * Play Voice: Click to listen to the AI speak its answer out loud.
+  * Pause: Click to temporarily pause speech playback.
+  * Resume: Click to resume speech playback.
+  * Stop: Click to stop speech playback immediately.
+- Source Citation Pills: Clickable citation pills showing exact file name, page/row number, and section heading for every factual statement.
+
+
+❓ FEATURE 3: CLARIFICATION FEEDBACK LOOP & REFINEMENT BOX
+- How it works: Triggers automatically when an underspecified or incomplete question is asked (e.g., "how much?" or "policy").
+- Suggested Question Pills: Displays clickable suggestion pills (e.g., "What is the out-of-network claim procedure?", "What is the daily lodging reimbursement limit?").
+- Refinement Input Box: Type your specific clarification or click a suggestion pill -> Submits refinement -> Displays refined grounded answer.
+
+
+🧠 FEATURE 4: MULTI-TURN CONVERSATION MEMORY
+- How it works: Allows you to ask follow-up questions without repeating context.
+- Example Usage:
+  * Turn 1: Type "Tell me about Plan A medical coverage" -> Read overview.
+  * Turn 2: Type "What is its deductible?" -> The web app automatically resolves "its" to "Plan A medical coverage" and returns $500 deductible.
+
+
+📂 FEATURE 5: KNOWLEDGE BASE DOCUMENT INGESTION MODULE (TAB 2)
+- Drag-and-Drop Dropzone: Upload any .pdf, .docx, .txt, or .csv file up to 25MB.
+- Domain Selector: Tag uploaded file under Healthcare Domain, Finance Domain, or General.
+- Chunk Size & Overlap Settings: Adjust target chunk size (default 500 characters) and overlap (default 100 characters).
+- Process & Index Document Button: Click to start processing.
+- Live Ingestion Terminal Log: Displays real-time progress (Uploading -> Parsing -> Chunking -> Indexing).
+- Indexed Document Inventory Table: Displays document ID, file name, domain tag, file type, total chunks created, and a Delete Trash Button to remove files.
+
+
+🔍 FEATURE 6: RESPONSE TRANSPARENCY PANEL (EVIDENCE INSPECTOR)
+- How it works: Provides full visibility into the evidence used by the AI.
+- Expandable Summary: Click "Inspect Evidence & Source Transparency Panel" accordion beneath any answer.
+- Evidence Chunk Cards:
+  * Relevance Score Meter: Visual progress bar showing relevance percentage (e.g., 84.6% relevance).
+  * Document Metadata: File name, domain tag, section heading, page/row number.
+  * Chunk Text Preview: Displays exact raw text snippet retrieved from the document.
+
+
+📊 FEATURE 7: RETRIEVAL VALIDATION BENCHMARK DASHBOARD (TAB 3)
+- Run Retrieval Evaluation Suite Button: Triggers automated accuracy testing directly inside the website.
+- Metric Gauges: Progress meters for Top-1 Accuracy, Top-3 Accuracy, Top-5 Accuracy, and Rejection Accuracy.
+- Benchmark Execution Table: Displays query ID, target domain, query type, hit rank, score, and pass/fail status for all 15 benchmark questions.
+
+
+📐 FEATURE 8: SYSTEM ARCHITECTURE & AGENT ROLES (TAB 4)
+- Flowchart Diagram: Visual layout of Web UI -> FastAPI Gateway -> 5-Agent RAG Pipeline -> Vector Store.
+- Agent Cards: Detailed role cards for Query Understanding, Retrieval, Clarification, Response Generation, and Conversation Memory Agents.
+
+
+================================================================================
+SECTION 3: HOW TO USE EVERY FEATURE IN THE WEB APP (STEP-BY-STEP ACTIONS)
+================================================================================
+
+STEP 1: ASK A FACTUAL QUESTION
+- Action: Go to "RAG & Voice Query" tab -> Type "What is the waiting period for medical coverage eligibility?" -> Click "Submit Query".
+- What You See:
+  * Badges: TYPE: FACTUAL | ROUTE: Retrieval Flow | HIGH CONFIDENCE (84.6%)
+  * Answer: "Based on Healthcare Policy 2026: Employees become eligible for full comprehensive medical coverage after completing 30 days of continuous employment [1]."
+  * Citation: Pill showing healthcare_policy.txt (Page/Row 1).
+
+STEP 2: TEST VOICE INPUT (SPEECH-TO-TEXT / STT)
+- Action: Click the Microphone icon next to query box -> Speak "What are the steps to submit an out of network claim?"
+- What You See:
+  * Microphone turns red and status shows "Listening... Speak now".
+  * Transcribed text appears in box -> Click "Submit Query".
+  * Answer: Formatted step-by-step numbered instructions (1. Itemized bill, 2. Form HC-104, 3. Receipts).
+
+STEP 3: TEST VOICE PLAYBACK (TEXT-TO-SPEECH / TTS)
+- Action: Click "Play Voice" button next to synthesized answer.
+- What You See:
+  * AI speaks answer out loud.
+  * Toolbar expands with "Pause", "Resume", and "Stop" speech buttons.
+
+STEP 4: INSPECT EVIDENCE TRANSPARENCY PANEL
+- Action: Click "Inspect Evidence & Source Transparency Panel" accordion under answer.
+- What You See:
+  * Accordion expands showing 84.6% relevance meter, file name, section, page number, and chunk text box.
+
+STEP 5: TEST MULTI-TURN CONVERSATION MEMORY
+- Action:
+  * Turn 1: Type "Tell me about Plan A medical coverage" -> Click Submit.
+  * Turn 2: Type "What is its deductible?" -> Click Submit.
+- What You See:
+  * Web app automatically resolves "its" to "Plan A medical coverage" and returns $500 deductible.
+
+STEP 6: TEST CLARIFICATION FEEDBACK LOOP
+- Action: Type "how much?" in query box -> Click Submit.
+- What You See:
+  * Clarification Card appears displaying suggested question pills + refinement box.
+  * Action: Click pill "What is the daily lodging reimbursement limit?" OR type "lodging limit" -> Click "Submit Refinement".
+  * Answer: Refines query and returns $250 lodging allowance.
+
+STEP 7: TEST OFF-TOPIC REJECTION
+- Action: Type "What is the company policy for pet insurance?" -> Click Submit.
+- What You See:
+  * Badges: TYPE: OUT_OF_BOUNDS | ROUTE: Clarification Flow
+  * Answer: "⚠️ The query falls outside the knowledge base scope. Please ask a question related to uploaded document policies."
+
+STEP 8: UPLOAD A NEW DOCUMENT
+- Action: Go to "Document Ingestion" tab -> Drag & drop a .pdf, .docx, .txt, or .csv file -> Click "Process & Index Document".
+- What You See:
+  * Terminal log shows Parsing -> Chunking -> Indexing.
+  * File appears in Indexed Document Table.
+
+STEP 9: RUN RETRIEVAL BENCHMARK TEST
+- Action: Go to "Retrieval Validation" tab -> Click "Run Retrieval Evaluation Suite".
+- What You See:
+  * Progress meters update and benchmark matrix table fills with pass/fail query results.
+================================================================================

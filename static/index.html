@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Knowledge Retrieval Platform | Milestone 1</title>
+    <title>CogniRetrieve | Multi-Agent RAG Knowledge Retrieval Platform</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <!-- Background Animated Gradient Glow -->
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
+    <!-- Subtle Background Grid Overlay -->
+    <div class="app-bg-grid"></div>
 
     <!-- Navigation Header -->
     <header class="navbar">
@@ -26,50 +25,50 @@
                     <i class="fa-solid fa-brain"></i>
                 </div>
                 <div class="brand-text">
-                    <span class="brand-name">CogniRetrieve<span class="accent-dot">.ai</span></span>
-                    <span class="brand-tag">Milestone 1 Core Platform</span>
+                    <span class="brand-name">CogniRetrieve</span>
+                    <span class="brand-tag">Multi-Agent RAG Platform</span>
                 </div>
             </div>
 
             <nav class="nav-tabs">
                 <button class="nav-btn active" data-tab="tab-query">
-                    <i class="fa-solid fa-comments"></i> RAG & Voice Query
+                    <i class="fa-solid fa-comments"></i> Query Workspace
                 </button>
                 <button class="nav-btn" data-tab="tab-ingest">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Document Ingestion
+                    <i class="fa-solid fa-file-import"></i> Ingestion Engine
                 </button>
                 <button class="nav-btn" data-tab="tab-eval">
-                    <i class="fa-solid fa-chart-line"></i> Retrieval Validation
+                    <i class="fa-solid fa-chart-simple"></i> Accuracy Benchmark
                 </button>
                 <button class="nav-btn" data-tab="tab-arch">
-                    <i class="fa-solid fa-network-wired"></i> System Architecture
+                    <i class="fa-solid fa-sitemap"></i> System Architecture
                 </button>
             </nav>
 
             <div class="nav-actions">
                 <div class="status-pill">
-                    <span class="pulse-dot"></span> Gateway Active
+                    <span class="status-dot"></span> Gateway Active
                 </div>
             </div>
         </div>
     </header>
 
     <main class="main-content">
-        <!-- TOP PLATFORM METRICS -->
+        <!-- PLATFORM METRICS HEADER BAR -->
         <section class="top-stats-bar">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
                     <div class="stat-info">
                         <span class="stat-val" id="stat-docs">0</span>
                         <span class="stat-lbl">Ingested Documents</span>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-cubes"></i></div>
                     <div class="stat-info">
                         <span class="stat-val" id="stat-chunks">0</span>
-                        <span class="stat-lbl">Indexed Chunks</span>
+                        <span class="stat-lbl">Indexed Vector Chunks</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -80,29 +79,37 @@
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-microphone"></i></div>
                     <div class="stat-info">
-                        <span class="stat-val">Web Speech</span>
-                        <span class="stat-lbl">STT & TTS Enabled</span>
+                        <span class="stat-val">Enabled</span>
+                        <span class="stat-lbl">Web Speech STT & TTS</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FEATURE TAB 1: RAG & WEB SPEECH QUERY -->
+        <!-- TAB 1: MULTI-AGENT QUERY RESOLUTION WORKSPACE -->
         <section id="tab-query" class="tab-pane active">
             <div class="query-layout">
                 <!-- Main Query Panel -->
-                <div class="glass-card query-card">
+                <div class="card query-card">
                     <div class="card-header">
-                        <h2><i class="fa-solid fa-robot"></i> Multi-Agent Query Resolution</h2>
+                        <h2><i class="fa-solid fa-magnifying-glass"></i> Multi-Agent Query Resolution System</h2>
                         <div class="filter-group">
-                            <label for="domain-filter-select"><i class="fa-solid fa-filter"></i> Domain Filter:</label>
+                            <label for="domain-filter-select"><i class="fa-solid fa-filter"></i> Knowledge Domain:</label>
                             <select id="domain-filter-select" class="custom-select">
-                                <option value="all">All Domains</option>
-                                <option value="Healthcare">Healthcare Domain</option>
-                                <option value="Finance">Finance Domain</option>
-                                <option value="General">General</option>
+                                <option value="all">All Knowledge Domains</option>
+                                <option value="Healthcare">Healthcare & Medical</option>
+                                <option value="Finance">Finance & Accounting</option>
+                                <option value="IT & Cybersecurity">IT & Cybersecurity</option>
+                                <option value="Human Resources">Human Resources (HR)</option>
+                                <option value="Legal & Compliance">Legal & Compliance</option>
+                                <option value="Procurement">Procurement & Supply Chain</option>
+                                <option value="Operations">Operations & Policy</option>
+                                <option value="Engineering">Engineering & Technical</option>
+                                <option value="Customer Support">Customer Support</option>
+                                <option value="Marketing & Sales">Marketing & Sales</option>
+                                <option value="General">General / Uncategorized</option>
                             </select>
                         </div>
                     </div>
@@ -110,7 +117,7 @@
                     <!-- Voice Controls & Input Bar -->
                     <div class="input-container">
                         <div class="input-wrapper">
-                            <textarea id="user-query-input" placeholder="Ask a question or click the mic to speak (e.g. 'What is the waiting period for medical coverage?')..." rows="3"></textarea>
+                            <textarea id="user-query-input" placeholder="Enter your query or click the microphone to speak (e.g. 'What is the waiting period for medical coverage?')..." rows="3"></textarea>
                             <button id="btn-stt" class="mic-btn" title="Voice Input (Speech-to-Text)">
                                 <i class="fa-solid fa-microphone"></i>
                             </button>
@@ -119,8 +126,8 @@
                             <span id="stt-status" class="stt-indicator"><i class="fa-solid fa-circle"></i> Mic Ready</span>
                             <div class="action-buttons">
                                 <button id="btn-clear-query" class="btn btn-secondary btn-sm">Clear</button>
-                                <button id="btn-submit-query" class="btn btn-primary btn-glow">
-                                    <i class="fa-solid fa-paper-plane"></i> Submit Query
+                                <button id="btn-submit-query" class="btn btn-primary">
+                                    <i class="fa-solid fa-paper-plane"></i> Run Resolution
                                 </button>
                             </div>
                         </div>
@@ -128,14 +135,14 @@
 
                     <!-- Live Query Output Container -->
                     <div id="query-output-section" class="output-section hidden">
-                        <!-- M2/M3 Meta Badges Bar -->
+                        <!-- Meta Badges Bar -->
                         <div class="m2-badges-bar">
                             <span id="query-type-badge" class="badge badge-primary"><i class="fa-solid fa-tag"></i> Type: --</span>
                             <span id="routing-path-badge" class="badge badge-info"><i class="fa-solid fa-route"></i> Route: --</span>
-                            <span id="confidence-level-badge" class="badge badge-success"><i class="fa-solid fa-shield"></i> Confidence: --</span>
+                            <span id="confidence-level-badge" class="badge badge-success"><i class="fa-solid fa-shield-halved"></i> Confidence: --</span>
                         </div>
 
-                        <!-- M3.1 Clarification Response / Refinement Bar -->
+                        <!-- Clarification Response / Refinement Bar -->
                         <div id="clarification-bar" class="clarification-card hidden">
                             <div class="clarification-header">
                                 <i class="fa-solid fa-circle-question"></i>
@@ -144,7 +151,7 @@
                             <p id="clarification-message">Question needs refinement.</p>
                             <div id="suggested-questions-pills" class="suggestions-grid"></div>
                             <div class="refine-input-row">
-                                <input type="text" id="refine-query-input" placeholder="Type your refinement or click a suggested question above..." class="custom-input">
+                                <input type="text" id="refine-query-input" placeholder="Type your refinement or select a suggested question above..." class="custom-input">
                                 <button id="btn-submit-refinement" class="btn btn-primary btn-sm">
                                     <i class="fa-solid fa-paper-plane"></i> Submit Refinement
                                 </button>
@@ -155,20 +162,20 @@
                         <div class="answer-box">
                             <div class="answer-header">
                                 <div class="answer-title">
-                                    <i class="fa-solid fa-sparkles"></i> Synthesized Grounded Response
+                                    <i class="fa-solid fa-file-pen"></i> Synthesized Grounded Response
                                 </div>
-                                <!-- M3.3 Voice TTS Toolbar -->
+                                <!-- Voice TTS Toolbar -->
                                 <div class="tts-toolbar">
                                     <button id="btn-tts" class="btn btn-secondary btn-sm" title="Play Response (Text-to-Speech)">
-                                        <i class="fa-solid fa-volume-high"></i> Play Voice
+                                        <i class="fa-solid fa-volume-high"></i> Read Aloud
                                     </button>
-                                    <button id="btn-tts-pause" class="btn btn-secondary btn-sm hidden" title="Pause Speech">
+                                    <button id="btn-tts-pause" class="btn btn-secondary btn-sm hidden">
                                         <i class="fa-solid fa-pause"></i> Pause
                                     </button>
-                                    <button id="btn-tts-resume" class="btn btn-secondary btn-sm hidden" title="Resume Speech">
+                                    <button id="btn-tts-resume" class="btn btn-secondary btn-sm hidden">
                                         <i class="fa-solid fa-play"></i> Resume
                                     </button>
-                                    <button id="btn-tts-stop" class="btn btn-secondary btn-sm hidden" title="Stop Speech">
+                                    <button id="btn-tts-stop" class="btn btn-secondary btn-sm hidden">
                                         <i class="fa-solid fa-stop"></i> Stop
                                     </button>
                                 </div>
@@ -182,15 +189,15 @@
                         <div class="citations-box">
                             <h3><i class="fa-solid fa-quote-right"></i> Source Citations & Attribution</h3>
                             <div id="citations-container" class="citations-grid">
-                                <!-- Citation Pills -->
+                                <!-- Citation Items -->
                             </div>
                         </div>
 
-                        <!-- M3.4 Response Transparency Panel -->
+                        <!-- Response Transparency Panel -->
                         <div class="transparency-section">
                             <details class="transparency-accordion" id="transparency-accordion">
                                 <summary class="transparency-summary">
-                                    <i class="fa-solid fa-magnifying-glass-location"></i> Inspect Evidence & Source Transparency Panel
+                                    <i class="fa-solid fa-magnifying-glass"></i> Evidence Inspector & Source Transparency
                                     <span class="badge badge-info" id="evidence-count-badge">0 Chunks</span>
                                 </summary>
                                 <div class="transparency-content" id="transparency-content">
@@ -201,55 +208,55 @@
                     </div>
                 </div>
 
-                <!-- Right Side: 5-Agent Execution Workflow Timeline -->
-                <div class="glass-card agent-timeline-card">
+                <!-- 5-Agent Execution Workflow Timeline -->
+                <div class="card agent-timeline-card">
                     <div class="card-header">
-                        <h3><i class="fa-solid fa-diagram-project"></i> 5-Agent Workflow</h3>
-                        <span class="badge badge-primary">LangGraph</span>
+                        <h3><i class="fa-solid fa-gears"></i> 5-Agent Pipeline Timeline</h3>
+                        <span class="badge badge-primary">Sequential Execution</span>
                     </div>
 
                     <div class="timeline-stepper" id="timeline-stepper">
                         <div class="step-item" id="step-qua">
-                            <div class="step-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                            <div class="step-icon">1</div>
                             <div class="step-content">
-                                <h4>1. Query Understanding Agent</h4>
+                                <h4>Query Understanding Agent</h4>
                                 <p class="step-desc">Classifies intent & expands terms.</p>
                                 <span class="step-data">Status: Idle</span>
                             </div>
                         </div>
 
                         <div class="step-item" id="step-ret">
-                            <div class="step-icon"><i class="fa-solid fa-database"></i></div>
+                            <div class="step-icon">2</div>
                             <div class="step-content">
-                                <h4>2. Retrieval Agent</h4>
+                                <h4>Retrieval Agent</h4>
                                 <p class="step-desc">Searches dense vector store.</p>
                                 <span class="step-data">Status: Idle</span>
                             </div>
                         </div>
 
                         <div class="step-item" id="step-clar">
-                            <div class="step-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                            <div class="step-icon">3</div>
                             <div class="step-content">
-                                <h4>3. Clarification Agent</h4>
-                                <p class="step-desc">Checks confidence threshold (&gt;0.65).</p>
+                                <h4>Clarification Agent</h4>
+                                <p class="step-desc">Evaluates confidence threshold (>0.65).</p>
                                 <span class="step-data">Status: Idle</span>
                             </div>
                         </div>
 
                         <div class="step-item" id="step-resp">
-                            <div class="step-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <div class="step-icon">4</div>
                             <div class="step-content">
-                                <h4>4. Response Generation Agent</h4>
-                                <p class="step-desc">Synthesizes grounded text with citations.</p>
+                                <h4>Response Generation Agent</h4>
+                                <p class="step-desc">Synthesizes answer with citations.</p>
                                 <span class="step-data">Status: Idle</span>
                             </div>
                         </div>
 
                         <div class="step-item" id="step-mem">
-                            <div class="step-icon"><i class="fa-solid fa-memory"></i></div>
+                            <div class="step-icon">5</div>
                             <div class="step-content">
-                                <h4>5. Conversation Memory Agent</h4>
-                                <p class="step-desc">Tracks session history & context state.</p>
+                                <h4>Conversation Memory Agent</h4>
+                                <p class="step-desc">Tracks session context state.</p>
                                 <span class="step-data">Status: Idle</span>
                             </div>
                         </div>
@@ -258,22 +265,21 @@
             </div>
         </section>
 
-        <!-- FEATURE TAB 2: KNOWLEDGE BASE INGESTION -->
+        <!-- TAB 2: KNOWLEDGE BASE INGESTION ENGINE -->
         <section id="tab-ingest" class="tab-pane">
             <div class="ingest-layout">
                 <!-- Dropzone Uploader -->
-                <div class="glass-card upload-card">
+                <div class="card upload-card">
                     <div class="card-header">
-                        <h2><i class="fa-solid fa-file-arrow-up"></i> Document Ingestion Module (PDF, DOCX, TXT, CSV)</h2>
-                        <span class="badge badge-info">Multi-Format Extractor</span>
+                        <h2><i class="fa-solid fa-file-arrow-up"></i> Document Ingestion Engine (.pdf, .docx, .txt, .csv)</h2>
+                        <span class="badge badge-info">Multi-Format Parser</span>
                     </div>
 
                     <form id="ingest-form" class="upload-form">
                         <div class="dropzone" id="dropzone">
                             <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
-                            <h3>Drag & Drop document file here</h3>
-                            <p>or click to browse from computer</p>
-                            <span class="dropzone-formats">Supported Formats: .pdf, .docx, .txt, .csv</span>
+                            <h3>Select or drop document file here</h3>
+                            <p>Supported Formats: PDF, DOCX, TXT, CSV</p>
                             <input type="file" id="file-input" name="file" accept=".pdf,.docx,.txt,.csv" hidden>
                         </div>
 
@@ -285,36 +291,44 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="ingest-domain"><i class="fa-solid fa-tag"></i> Target Knowledge Domain</label>
+                                <label for="ingest-domain">Knowledge Domain</label>
                                 <select id="ingest-domain" name="domain" class="custom-select">
-                                    <option value="Healthcare">Healthcare Domain</option>
-                                    <option value="Finance">Finance Domain</option>
-                                    <option value="General">General / Corporate</option>
+                                    <option value="Healthcare">Healthcare & Medical</option>
+                                    <option value="Finance">Finance & Accounting</option>
+                                    <option value="IT & Cybersecurity">IT & Cybersecurity</option>
+                                    <option value="Human Resources">Human Resources (HR)</option>
+                                    <option value="Legal & Compliance">Legal & Compliance</option>
+                                    <option value="Procurement">Procurement & Supply Chain</option>
+                                    <option value="Operations">Operations & Policy</option>
+                                    <option value="Engineering">Engineering & Technical</option>
+                                    <option value="Customer Support">Customer Support</option>
+                                    <option value="Marketing & Sales">Marketing & Sales</option>
+                                    <option value="General">General / Uncategorized</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="chunk-size"><i class="fa-solid fa-scissors"></i> Chunk Size (Characters)</label>
+                                <label for="chunk-size">Chunk Size (Chars)</label>
                                 <input type="number" id="chunk-size" name="chunk_size" value="500" class="custom-input">
                             </div>
                             <div class="form-group">
-                                <label for="chunk-overlap"><i class="fa-solid fa-overlap"></i> Chunk Overlap</label>
+                                <label for="chunk-overlap">Chunk Overlap</label>
                                 <input type="number" id="chunk-overlap" name="chunk_overlap" value="100" class="custom-input">
                             </div>
                         </div>
 
-                        <button type="submit" id="btn-start-ingest" class="btn btn-primary btn-glow btn-block">
+                        <button type="submit" id="btn-start-ingest" class="btn btn-primary btn-block">
                             <i class="fa-solid fa-gears"></i> Process & Index Document
                         </button>
                     </form>
 
                     <div id="ingest-status-log" class="status-log hidden">
-                        <h4><i class="fa-solid fa-terminal"></i> Ingestion Log Output</h4>
+                        <h4>Ingestion Log Output</h4>
                         <pre id="ingest-log-text">Ready for upload...</pre>
                     </div>
                 </div>
 
                 <!-- Indexed Documents Table -->
-                <div class="glass-card doc-list-card">
+                <div class="card doc-list-card">
                     <div class="card-header">
                         <h3><i class="fa-solid fa-folder-open"></i> Indexed Knowledge Base Documents</h3>
                         <button id="btn-refresh-docs" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate"></i> Refresh</button>
@@ -344,54 +358,54 @@
             </div>
         </section>
 
-        <!-- FEATURE TAB 3: RETRIEVAL VALIDATION -->
+        <!-- TAB 3: RETRIEVAL ACCURACY BENCHMARK -->
         <section id="tab-eval" class="tab-pane">
             <div class="eval-layout">
-                <div class="glass-card eval-header-card">
+                <div class="card eval-header-card">
                     <div class="eval-title-wrap">
-                        <h2><i class="fa-solid fa-microscope"></i> Multi-Domain RAG Retrieval Benchmark</h2>
-                        <p>Evaluates Top-1, Top-3, Top-5 Accuracy & Rejection Accuracy across Healthcare and Finance query datasets.</p>
+                        <h2><i class="fa-solid fa-chart-simple"></i> Multi-Domain RAG Retrieval Benchmark</h2>
+                        <p>Evaluates Top-1, Top-3, Top-5 Accuracy & Rejection Accuracy across Healthcare and Finance query sets.</p>
                     </div>
-                    <button id="btn-run-eval" class="btn btn-primary btn-glow">
-                        <i class="fa-solid fa-vial-circle-check"></i> Run Retrieval Evaluation Suite
+                    <button id="btn-run-eval" class="btn btn-primary">
+                        <i class="fa-solid fa-play"></i> Run Retrieval Benchmark
                     </button>
                 </div>
 
                 <!-- Metric Gauges -->
                 <div class="eval-metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-title">Top-1 Retrieval Accuracy</div>
+                        <div class="metric-title">Top-1 Accuracy</div>
                         <div class="metric-value" id="val-top1">84.6%</div>
-                        <div class="metric-target">Target: &ge; 75%</div>
+                        <div class="metric-target">Target: >= 75%</div>
                         <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-top1" style="width: 84.6%;"></div></div>
                     </div>
 
                     <div class="metric-card">
-                        <div class="metric-title">Top-3 Retrieval Accuracy</div>
-                        <div class="metric-value accent-blue" id="val-top3">100%</div>
-                        <div class="metric-target">Target: &ge; 85%</div>
+                        <div class="metric-title">Top-3 Accuracy</div>
+                        <div class="metric-value text-blue" id="val-top3">100%</div>
+                        <div class="metric-target">Target: >= 85%</div>
                         <div class="progress-bar-bg"><div class="progress-bar-fill fill-blue" id="bar-top3" style="width: 100%;"></div></div>
                     </div>
 
                     <div class="metric-card">
-                        <div class="metric-title">Top-5 Retrieval Accuracy</div>
+                        <div class="metric-title">Top-5 Accuracy</div>
                         <div class="metric-value" id="val-top5">100%</div>
-                        <div class="metric-target">Target: &ge; 92%</div>
+                        <div class="metric-target">Target: >= 92%</div>
                         <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-top5" style="width: 100%;"></div></div>
                     </div>
 
                     <div class="metric-card">
-                        <div class="metric-title">Rejection Accuracy (Out-of-Bounds)</div>
+                        <div class="metric-title">Rejection Accuracy</div>
                         <div class="metric-value text-green" id="val-rejection">100%</div>
                         <div class="metric-target">False Retrieval Rate: 0%</div>
                         <div class="progress-bar-bg"><div class="progress-bar-fill fill-green" id="bar-rejection" style="width: 100%;"></div></div>
                     </div>
                 </div>
 
-                <!-- Query Results Table -->
-                <div class="glass-card eval-results-card">
+                <!-- Execution Matrix Table -->
+                <div class="card eval-results-card">
                     <div class="card-header">
-                        <h3><i class="fa-solid fa-list-check"></i> Benchmark Query Execution Matrix</h3>
+                        <h3><i class="fa-solid fa-list-check"></i> Benchmark Execution Matrix</h3>
                         <span id="eval-summary-badge" class="badge badge-info">2 Domains Tested</span>
                     </div>
 
@@ -410,7 +424,7 @@
                             </thead>
                             <tbody id="eval-table-body">
                                 <tr>
-                                    <td colspan="7" class="text-center">Click 'Run Retrieval Evaluation Suite' to execute accuracy benchmark tests.</td>
+                                    <td colspan="7" class="text-center">Click 'Run Retrieval Benchmark' to execute validation test suite.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -419,42 +433,42 @@
             </div>
         </section>
 
-        <!-- FEATURE TAB 4: SYSTEM ARCHITECTURE -->
+        <!-- TAB 4: SYSTEM ARCHITECTURE -->
         <section id="tab-arch" class="tab-pane">
             <div class="arch-layout">
-                <div class="glass-card arch-card">
+                <div class="card arch-card">
                     <div class="card-header">
-                        <h2><i class="fa-solid fa-sitemap"></i> High-Level Architecture & 5-Agent Pipeline</h2>
-                        <span class="badge badge-primary">Milestone 1 Architecture Specification</span>
+                        <h2><i class="fa-solid fa-sitemap"></i> System Architecture & Pipeline Flow</h2>
+                        <span class="badge badge-primary">System Specification</span>
                     </div>
 
                     <div class="arch-diagram">
                         <div class="arch-flow">
-                            <div class="arch-node node-ui">
-                                <div class="node-icon"><i class="fa-solid fa-display"></i></div>
-                                <h4>1. Web Speech & UI Layer</h4>
-                                <p>Web Speech STT / TTS + Electric Dark UI</p>
+                            <div class="arch-node">
+                                <div class="node-icon"><i class="fa-solid fa-desktop"></i></div>
+                                <h4>1. Speech & UI Layer</h4>
+                                <p>Web Speech STT / TTS + Workspace UI</p>
                             </div>
-                            <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="arch-arrow"><i class="fa-solid fa-angle-right"></i></div>
 
-                            <div class="arch-node node-api">
+                            <div class="arch-node">
                                 <div class="node-icon"><i class="fa-solid fa-server"></i></div>
                                 <h4>2. FastAPI Gateway</h4>
                                 <p>Asynchronous REST API Router</p>
                             </div>
-                            <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="arch-arrow"><i class="fa-solid fa-angle-right"></i></div>
 
-                            <div class="arch-node node-agent">
-                                <div class="node-icon"><i class="fa-solid fa-users-gear"></i></div>
-                                <h4>3. 5-Agent RAG Pipeline</h4>
+                            <div class="arch-node">
+                                <div class="node-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                                <h4>3. 5-Agent Pipeline</h4>
                                 <p>Query, Retrieval, Clarification, Response, Memory</p>
                             </div>
-                            <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="arch-arrow"><i class="fa-solid fa-angle-right"></i></div>
 
-                            <div class="arch-node node-db">
+                            <div class="arch-node">
                                 <div class="node-icon"><i class="fa-solid fa-database"></i></div>
                                 <h4>4. Vector & Chunk Store</h4>
-                                <p>ChromaDB / Vector Store + Metadata</p>
+                                <p>ChromaDB Vector Store + Metadata</p>
                             </div>
                         </div>
                     </div>
@@ -463,10 +477,10 @@
                     <div class="agent-roles-grid">
                         <div class="agent-card">
                             <div class="agent-card-header">
-                                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                                <i class="fa-solid fa-magnifying-glass"></i>
                                 <h3>Query Understanding Agent</h3>
                             </div>
-                            <p>Analyzes user query intent, extracts domain entities, and generates HyDE subqueries.</p>
+                            <p>Analyzes user query intent, extracts domain entities, and generates subqueries.</p>
                         </div>
 
                         <div class="agent-card">
@@ -474,23 +488,23 @@
                                 <i class="fa-solid fa-database"></i>
                                 <h3>Retrieval Agent</h3>
                             </div>
-                            <p>Executes dense vector similarity search across chunk indexes with domain filters.</p>
+                            <p>Executes vector similarity search across chunk indexes with domain filters.</p>
                         </div>
 
                         <div class="agent-card">
                             <div class="agent-card-header">
-                                <i class="fa-solid fa-clipboard-check"></i>
+                                <i class="fa-solid fa-check-double"></i>
                                 <h3>Clarification Agent</h3>
                             </div>
-                            <p>Evaluates similarity confidence scores against threshold (&lt;0.65) and triggers clarifications.</p>
+                            <p>Evaluates similarity confidence scores against threshold (&lt;0.65) and handles refinements.</p>
                         </div>
 
                         <div class="agent-card">
                             <div class="agent-card-header">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <i class="fa-solid fa-pen-to-square"></i>
                                 <h3>Response Generation Agent</h3>
                             </div>
-                            <p>Synthesizes grounded answers strictly adherence to retrieved chunk context with source citations.</p>
+                            <p>Synthesizes grounded answers strictly from retrieved chunk context with citations.</p>
                         </div>
 
                         <div class="agent-card">
@@ -498,7 +512,7 @@
                                 <i class="fa-solid fa-memory"></i>
                                 <h3>Conversation Memory Agent</h3>
                             </div>
-                            <p>Maintains multi-turn dialogue history and session context state across turns.</p>
+                            <p>Maintains dialogue history and session context state across multi-turn interactions.</p>
                         </div>
                     </div>
                 </div>
@@ -509,7 +523,14 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-            <p>&copy; 2026 AI-Based Knowledge Retrieval Platform — Milestone 1 Submission.</p>
+            <p>&copy; 2026 CogniRetrieve AI Knowledge Platform. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#terms">Terms of Service</a>
+                <span class="footer-sep">&bull;</span>
+                <a href="#privacy">Privacy Policy</a>
+                <span class="footer-sep">&bull;</span>
+                <a href="#docs">Documentation</a>
+            </div>
         </div>
     </footer>
 
