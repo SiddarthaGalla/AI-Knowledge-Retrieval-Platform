@@ -52,14 +52,8 @@ class QueryRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     logger.info("Initializing AI Knowledge Retrieval Platform Gateway...")
-    # Pre-seed and refresh Healthcare & Finance sample datasets
-    try:
-        logger.info("Ensuring Healthcare & Finance sample datasets are indexed and ready...")
-        eval_runner.prepare_sample_datasets()
-        stats = vector_store.get_stats()
-        logger.info(f"Vector Store initialized: {stats['total_documents']} documents, {stats['total_chunks']} chunks indexed.")
-    except Exception as e:
-        logger.warning(f"Pre-seeding warning: {e}")
+    stats = vector_store.get_stats()
+    logger.info(f"Vector Store initialized: {stats['total_documents']} documents, {stats['total_chunks']} chunks indexed.")
 
 
 # Static directory setup
