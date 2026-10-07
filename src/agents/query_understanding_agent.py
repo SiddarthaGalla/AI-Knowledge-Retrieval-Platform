@@ -41,8 +41,8 @@ class QueryUnderstandingAgent:
             return {
                 "query_type": "ambiguous",
                 "confidence": 0.85,
-                "routing_path": "clarification_flow",
-                "reason": "Query is underspecified or lacks essential entity context."
+                "routing_path": "retrieval_flow",
+                "reason": "Query is underspecified - routing through general retrieval & synthesis."
             }
 
         # 2. Comparative query check

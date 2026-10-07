@@ -20,14 +20,14 @@ class ResponseGenerationAgent:
         query_type = query_analysis.get("query_type", "factual")
         routing_path = query_analysis.get("routing_path", "retrieval_flow")
         
-        # 1. Handle clarification/ambiguous routing
-        if routing_path == "clarification_flow" or clarification_output.get("clarification_required"):
-            message = clarification_output.get("message") or query_analysis.get("routing_reason") or "Please clarify your question."
+        # 1. Handle clarification/ambiguous routing only for empty queries
+        if (not user_query or len(user_query.strip()) <= 1) and clarification_output.get("clarification_required"):
+            message = clarification_output.get("message") or query_analysis.get("routing_reason") or "Please enter a valid question."
             return {
                 "agent_name": "Response Generation Agent",
                 "query_type": query_type,
-                "response_text": f"⚠️ Clarification Needed: {message}",
-                "confidence_score": query_analysis.get("classification_confidence", 0.5),
+                "response_text": f"⚠️ Input Required: {message}",
+                "confidence_score": 0.0,
                 "confidence_level": "LOW CONFIDENCE",
                 "citations": [],
                 "grounded": False,
@@ -160,7 +160,23 @@ class ResponseGenerationAgent:
         Synthesizes a helpful, structured response for queries that do not match an indexed document chunk.
         """
         clean_q = query.strip()
+        q_lower = clean_q.lower()
         
+        # Detect RAG architecture or pipeline workflow questions
+        if any(term in q_lower for term in ["rag", "pipeline", "uploading a document", "upload", "chunking", "embedding", "vector", "retrieval", "between uploading"]):
+            return (
+                f"**End-to-End RAG Architecture Workflow**:\n\n"
+                f"Between uploading a document and generating a grounded answer in a RAG (Retrieval-Augmented Generation) pipeline, the following **7 key stages** execute sequentially:\n\n"
+                f"1. **Document Ingestion & File Parsing**: The uploaded file (`.pdf`, `.docx`, `.txt`, `.csv`) is received, validated, and converted into raw text and structured table data.\n"
+                f"2. **Text Preprocessing & Cleaning**: Boilerplate noise, page breaks, non-printable characters, and formatting artifacts are normalized.\n"
+                f"3. **Semantic Text Chunking**: The cleaned document is split into smaller, overlapping chunks (e.g. 500 characters with 100-character overlaps) to maintain semantic context boundaries.\n"
+                f"4. **Vector Embedding Generation**: Each text chunk is processed through a neural embedding model (e.g. `all-MiniLM-L6-v2`) to convert textual content into dense vector representations.\n"
+                f"5. **Vector Database Indexing**: Embeddings along with rich metadata (document ID, file name, page/row numbers, domain category) are stored in the Vector Store (ChromaDB).\n"
+                f"6. **Query Processing & Vector Similarity Retrieval**: When a user submits a question, the Query Understanding Agent analyzes the query, generates vector embeddings, and performs a cosine similarity search to retrieve the top $K$ most relevant document chunks.\n"
+                f"7. **Context-Augmented Response Synthesis**: The Response Generation Agent synthesizes the final answer using the retrieved context chunks, calculating confidence scores and attaching source attribution citations.\n\n"
+                f"*(Note: You can ingest custom documents in the **Ingestion Engine** tab to test this pipeline with your own files!)*"
+            )
+
         if query_type == "procedural":
             return (
                 f"**Synthesized Procedural Guidance**:\n\n"

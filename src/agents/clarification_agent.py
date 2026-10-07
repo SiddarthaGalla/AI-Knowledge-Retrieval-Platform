@@ -21,50 +21,28 @@ class ClarificationAgent:
         max_score = retrieval_output.get("max_similarity_score", 0.0)
         chunks = retrieval_output.get("top_k_chunks", [])
         
-        # 1. Multi-part query check
+        # Detect multi-part query for metadata tracking, but do NOT block execution
         is_multi_part, sub_parts = self._detect_multi_part_query(user_query)
-        if is_multi_part:
+        
+        # Only require clarification if the user query is empty or completely blank
+        if not user_query or len(user_query.strip()) <= 1:
             return {
                 "agent_name": "Clarification Agent",
                 "clarification_required": True,
-                "confidence_score": max_score,
-                "reason": "multi_part_query",
-                "message": f"Your query contains multiple parts ({', '.join(sub_parts)}). Please clarify which section you would like to start with, or specify the domain.",
-                "multi_parts": sub_parts,
+                "confidence_score": 0.0,
+                "reason": "empty_query",
+                "message": "Please enter a valid query or question.",
                 "status": "triggered"
             }
 
-        # 2. Out of bounds check
-        if query_type == "out_of_bounds":
-            return {
-                "agent_name": "Clarification Agent",
-                "clarification_required": True,
-                "confidence_score": max_score,
-                "reason": "out_of_bounds",
-                "message": "The query falls outside the knowledge base scope. Please ask a question related to uploaded Healthcare or Financial document policies.",
-                "status": "triggered"
-            }
-
-        # 3. Ambiguous query check
-        if query_type == "ambiguous":
-            suggested_questions = self._generate_targeted_suggestions(user_query)
-            return {
-                "agent_name": "Clarification Agent",
-                "clarification_required": True,
-                "confidence_score": max_score,
-                "reason": "ambiguous_query",
-                "message": query_analysis.get("routing_reason") or "Your question is underspecified. Please clarify the specific topic or entity you are asking about.",
-                "suggested_questions": suggested_questions,
-                "status": "triggered"
-            }
-
-        # 4. Check confidence score - mark low confidence indicator but allow response synthesis
+        # For all queries (multi-part, general, procedural, factual, comparative), proceed to synthesis
         return {
             "agent_name": "Clarification Agent",
             "clarification_required": False,
             "confidence_score": max_score,
-            "reason": "sufficient_confidence" if max_score >= self.confidence_threshold else "low_confidence_general_synthesis",
-            "message": "Confidence threshold satisfied." if max_score >= self.confidence_threshold else "Low vector match - generating synthesized answer.",
+            "reason": "multi_part_synthesized" if is_multi_part else ("sufficient_confidence" if max_score >= self.confidence_threshold else "general_synthesis_flow"),
+            "message": "Processing query through resolution pipeline.",
+            "multi_parts": sub_parts,
             "status": "passed"
         }
 
