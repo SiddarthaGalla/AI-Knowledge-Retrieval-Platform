@@ -299,29 +299,59 @@ function initQueryAndSpeechModule() {
     }
 
     // ----------------------------------------------------------------------
-    // Web Speech API - Text-to-Speech (TTS) Setup (M3.3)
+    // Web Speech API - Text-to-Speech (TTS) & Auto-Voice Assistant (M3.3)
     // ----------------------------------------------------------------------
+    let autoVoiceEnabled = true;
+    const btnToggleAutoVoice = document.getElementById('btn-toggle-auto-voice');
+
+    if (btnToggleAutoVoice) {
+        btnToggleAutoVoice.addEventListener('click', () => {
+            autoVoiceEnabled = !autoVoiceEnabled;
+            if (autoVoiceEnabled) {
+                btnToggleAutoVoice.classList.add('active');
+                btnToggleAutoVoice.innerHTML = '<i class="fa-solid fa-robot"></i> Auto-Voice: ON';
+            } else {
+                btnToggleAutoVoice.classList.remove('active');
+                btnToggleAutoVoice.innerHTML = '<i class="fa-solid fa-robot"></i> Auto-Voice: OFF';
+                window.speechSynthesis.cancel();
+                resetTTSButtons();
+            }
+        });
+    }
+
+    function speakCleanTTS(text) {
+        if (!('speechSynthesis' in window) || !text) return;
+        window.speechSynthesis.cancel();
+
+        // Format clean text for smooth spoken English
+        let cleanText = text
+            .replace(/\[\d+\]/g, '')
+            .replace(/\*\*/g, '')
+            .replace(/\*/g, '')
+            .replace(/#/g, '')
+            .replace(/⚠️|ℹ️|✅|❌/g, '')
+            .replace(/\n+/g, '. ')
+            .trim();
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+
+        utterance.onstart = () => {
+            btnTts.classList.add('hidden');
+            btnTtsPause.classList.remove('hidden');
+            btnTtsStop.classList.remove('hidden');
+        };
+
+        utterance.onend = () => resetTTSButtons();
+        utterance.onerror = () => resetTTSButtons();
+
+        window.speechSynthesis.speak(utterance);
+    }
+
     btnTts?.addEventListener('click', () => {
         if (!currentResponseText) return;
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(currentResponseText);
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-            
-            utterance.onstart = () => {
-                btnTts.classList.add('hidden');
-                btnTtsPause.classList.remove('hidden');
-                btnTtsStop.classList.remove('hidden');
-            };
-            
-            utterance.onend = () => resetTTSButtons();
-            utterance.onerror = () => resetTTSButtons();
-
-            window.speechSynthesis.speak(utterance);
-        } else {
-            alert('Text-to-Speech is not supported in your browser.');
-        }
+        speakCleanTTS(currentResponseText);
     });
 
     btnTtsPause?.addEventListener('click', () => {
@@ -474,10 +504,12 @@ function initQueryAndSpeechModule() {
                     citationsContainer.innerHTML = '<span style="font-size:0.85rem; color:#94a3b8;">No direct citations (General or Clarification Prompt).</span>';
                 }
 
-                // M3.4 Response Transparency Panel Evidence Inspector
-                renderTransparencyPanel(payload.retrieved_chunks || []);
-
                 completeTimeline(payload.agent_execution_log);
+
+                // Auto-Voice Assistant Speech Synthesis
+                if (autoVoiceEnabled && currentResponseText) {
+                    speakCleanTTS(currentResponseText);
+                }
             } else {
                 responseTextBody.textContent = `Error: ${data.detail || 'Failed to process query.'}`;
             }
