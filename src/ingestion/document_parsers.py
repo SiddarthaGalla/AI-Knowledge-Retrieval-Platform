@@ -59,7 +59,26 @@ class DocumentParser:
     @staticmethod
     def _parse_pdf(file_path: str) -> List[Dict[str, Any]]:
         blocks = []
-        # Attempt pdfplumber first for high quality text extraction
+        
+        # Method 1: Try pypdf (recommended)
+        try:
+            from pypdf import PdfReader
+            reader = PdfReader(file_path)
+            for page_num, page in enumerate(reader.pages, start=1):
+                text = page.extract_text() or ""
+                cleaned = clean_text(text)
+                if cleaned:
+                    blocks.append({
+                        "content": cleaned,
+                        "page_number": page_num,
+                        "section": f"Page {page_num}"
+                    })
+            if blocks:
+                return blocks
+        except Exception as e1:
+            logger.warning(f"pypdf extraction skipped for {file_path}: {e1}")
+
+        # Method 2: Try pdfplumber
         try:
             import pdfplumber
             with pdfplumber.open(file_path) as pdf:
@@ -72,11 +91,16 @@ class DocumentParser:
                             "page_number": page_num,
                             "section": f"Page {page_num}"
                         })
-        except Exception as e:
-            logger.warning(f"pdfplumber extraction failed for {file_path}: {e}. Falling back to pypdf.")
-            try:
-                from pypdf import PdfReader
-                reader = PdfReader(file_path)
+            if blocks:
+                return blocks
+        except Exception as e2:
+            logger.warning(f"pdfplumber extraction skipped for {file_path}: {e2}")
+
+        # Method 3: Try PyPDF2
+        try:
+            import PyPDF2
+            with open(file_path, "rb") as f:
+                reader = PyPDF2.PdfReader(f)
                 for page_num, page in enumerate(reader.pages, start=1):
                     text = page.extract_text() or ""
                     cleaned = clean_text(text)
@@ -86,10 +110,32 @@ class DocumentParser:
                             "page_number": page_num,
                             "section": f"Page {page_num}"
                         })
-            except Exception as e2:
-                logger.error(f"pypdf extraction failed for {file_path}: {e2}")
-                raise e2
-                
+            if blocks:
+                return blocks
+        except Exception as e3:
+            logger.warning(f"PyPDF2 extraction skipped for {file_path}: {e3}")
+
+        # Method 4: Raw text stream fallback for binary PDFs
+        try:
+            with open(file_path, "rb") as f:
+                content_bytes = f.read()
+                # Extract printable ASCII / UTF-8 text strings from PDF binary stream
+                import re
+                raw_strings = re.findall(rb"[\x20-\x7e\t\r\n]{4,}", content_bytes)
+                text_content = " ".join(s.decode("latin1", errors="ignore") for s in raw_strings if not s.startswith(b"/") and not s.startswith(b"%"))
+                cleaned = clean_text(text_content)
+                if cleaned:
+                    blocks.append({
+                        "content": cleaned[:4000],
+                        "page_number": 1,
+                        "section": "Extracted Text Stream"
+                    })
+        except Exception as e4:
+            logger.error(f"All PDF extraction methods failed for {file_path}: {e4}")
+
+        if not blocks:
+            raise ValueError(f"Could not extract text content from PDF file {file_path}. File may be image-only or password-protected.")
+
         return blocks
 
     @staticmethod
