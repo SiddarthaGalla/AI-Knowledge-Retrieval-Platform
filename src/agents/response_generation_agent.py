@@ -25,7 +25,10 @@ class ResponseGenerationAgent:
         'work', 'employee', 'employees', 'staff', 'member', 'members', 'according', 'based',
         'tell', 'give', 'explain', 'describe', 'provide', 'please', 'regarding', 'related',
         'code', 'notice', 'period', 'duration', 'level', 'levels', 'type', 'types',
-        'status', 'number', 'numbers', 'list', 'form', 'forms', 'time', 'times', 'day', 'days'
+        'status', 'number', 'numbers', 'list', 'form', 'forms', 'time', 'times', 'day', 'days',
+        'question', 'questions', 'ask', 'asking', 'asked', 'answer', 'answers', 'answering',
+        'query', 'queries', 'mean', 'means', 'meaning', 'tell', 'say', 'says', 'said',
+        'show', 'find', 'want', 'like'
     }
     
     def process(
@@ -133,7 +136,6 @@ class ResponseGenerationAgent:
         if not chunks:
             return False, "No chunks retrieved."
         
-        all_chunk_text = " ".join([c.get("content", "").lower() for c in chunks])
         core_terms = [w for w in re.findall(r"\b[a-zA-Z0-9_\-]{3,}\b", query.lower()) if w not in self.GENERIC_FILLER_WORDS]
         
         if not core_terms:
@@ -142,25 +144,24 @@ class ResponseGenerationAgent:
                 return True, "Passed generic high-confidence match."
             return False, "Query contains only generic filler words without a specific topic anchor."
             
-        matched_terms = [t for t in core_terms if t in all_chunk_text]
-        
-        # Grounding decision logic:
-        # 1 term query: Must match that exact term
-        if len(core_terms) == 1:
-            is_grounded = (len(matched_terms) == 1)
-        # 2 terms query: Must match both terms
-        elif len(core_terms) == 2:
-            is_grounded = (len(matched_terms) == 2)
-        # 3+ terms query: Must match at least 2 terms and at least 50% of the core terms
-        else:
-            is_grounded = (len(matched_terms) >= 2 and (len(matched_terms) / len(core_terms)) >= 0.50)
+        # 1. Reject if any core term is completely missing across all retrieved chunks (indicates foreign / out-of-document concept)
+        missing_everywhere = [t for t in core_terms if not any(t in c.get("content", "").lower() for c in chunks)]
+        if missing_everywhere:
+            return False, f"Missing core topic keywords in uploaded document: {', '.join(missing_everywhere[:4])}"
             
-        if not is_grounded:
-            missing = [t for t in core_terms if t not in matched_terms]
-            reason = f"Missing core topic keywords in uploaded document: {', '.join(missing[:4])}"
-            return False, reason
+        # 2. Verify single-chunk co-occurrence (terms must appear in the same document section)
+        for chunk in chunks:
+            content_lower = chunk.get("content", "").lower()
+            matched_terms = [t for t in core_terms if t in content_lower]
             
-        return True, "Verified grounded content."
+            # For 1-3 terms, ALL must co-occur in the same chunk
+            if len(core_terms) <= 3 and len(matched_terms) == len(core_terms):
+                return True, "Verified grounded content."
+            # For 4+ terms, at least 75% must co-occur in the same chunk
+            elif len(core_terms) >= 4 and (len(matched_terms) / len(core_terms)) >= 0.75:
+                return True, "Verified grounded content."
+                
+        return False, f"The query terms ({', '.join(core_terms[:3])}) do not co-occur in any single section of your document."
 
     def _synthesize_response_by_type(
         self, 
@@ -175,20 +176,19 @@ class ResponseGenerationAgent:
         source_doc = citations[0]["source_document"]
         loc_info = f"Page/Row {citations[0]['page_or_row']}"
 
-        # Clean lines from chunks, ignoring raw question title headers
-        lines = []
-        for chunk in chunks:
-            for line in chunk["content"].split("\n"):
-                l_strip = line.strip()
-                if not l_strip:
-                    continue
-                if re.match(r"^\d+[\.\)]\s*(what|how|why|when|where|which|can|explain)", l_strip, re.IGNORECASE) and l_strip.endswith("?"):
-                    continue
-                lines.append(l_strip)
+        # Clean lines strictly from the top matching chunk (never splice lines across disparate chunks)
+        chunk_lines = []
+        for line in top_chunk["content"].split("\n"):
+            l_strip = line.strip()
+            if not l_strip:
+                continue
+            if re.match(r"^\d+[\.\)]\s*(what|how|why|when|where|which|can|explain)", l_strip, re.IGNORECASE) and l_strip.endswith("?"):
+                continue
+            chunk_lines.append(l_strip)
 
-        explanatory_lines = [l for l in lines if not l.endswith("?") and len(l) > 15]
+        explanatory_lines = [l for l in chunk_lines if not l.endswith("?") and len(l) > 15]
         if not explanatory_lines:
-            explanatory_lines = [l.strip() for chunk in chunks for l in chunk["content"].split("\n") if l.strip()]
+            explanatory_lines = chunk_lines
 
         # Rank lines by distinctive query terms
         core_terms = [w for w in re.findall(r"\b[a-zA-Z0-9_\-]{3,}\b", query.lower()) if w not in self.GENERIC_FILLER_WORDS]
@@ -236,10 +236,22 @@ class ResponseGenerationAgent:
             if not summary.endswith("."):
                 summary += "."
             answer = f"Based on the Knowledge Base (**{source_doc}**, {loc_info}) {cite_1}:\n\n{summary}"
-            if len(citations) > 1:
-                second_cite = citations[1]["citation_id"]
+            
+            # Add secondary chunk excerpt only if it contains actual relevant lines for core_terms
+            if len(chunks) > 1 and len(citations) > 1:
+                second_chunk = chunks[1]
                 second_doc = citations[1]["source_document"]
-                answer += f"\n\n**Additional Details** ({second_doc}) {second_cite}: Document evidence provides additional context regarding this topic."
+                second_loc = f"Page/Row {citations[1]['page_or_row']}"
+                second_cite = citations[1]["citation_id"]
+                second_lines = [
+                    l.strip() for l in second_chunk.get("content", "").split("\n")
+                    if l.strip() and not l.strip().endswith("?") and any(t in l.lower() for t in core_terms)
+                ]
+                if second_lines:
+                    second_summary = " ".join(second_lines[:2])
+                    if not second_summary.endswith("."):
+                        second_summary += "."
+                    answer += f"\n\n**Additional Context** (**{second_doc}**, {second_loc}) {second_cite}:\n{second_summary}"
             return answer
 
     def _compute_confidence_level(self, score: float, chunk_count: int) -> str:
