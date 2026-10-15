@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initIngestionModule();
     initQueryAndSpeechModule();
     initEvaluationModule();
+    initQueryHistory();
 });
 
 /* ==========================================================================
@@ -510,6 +511,9 @@ function initQueryAndSpeechModule() {
                 if (autoVoiceEnabled && currentResponseText) {
                     speakCleanTTS(currentResponseText);
                 }
+
+                // Record inquiry in history log
+                recordQueryHistory(query, payload);
             } else {
                 responseTextBody.textContent = `Error: ${data.detail || 'Failed to process query.'}`;
             }
@@ -669,3 +673,126 @@ function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
+
+/* ==========================================================================
+   7. PAST INQUIRIES & QUERY ANALYTICS MODULE
+   ========================================================================== */
+function initQueryHistory() {
+    renderQueryHistory();
+    document.getElementById('btn-clear-history')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear your past inquiries log?')) {
+            localStorage.removeItem('cogni_query_history');
+            renderQueryHistory();
+        }
+    });
+}
+
+function getQueryHistory() {
+    try {
+        const stored = localStorage.getItem('cogni_query_history');
+        return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function recordQueryHistory(query, payload) {
+    const domainFilter = document.getElementById('domain-filter-select')?.value;
+    const detectedDomain = payload.domain || (domainFilter && domainFilter !== 'all' ? domainFilter : 'General');
+    const sourceDoc = payload.citations && payload.citations.length > 0 ? payload.citations[0].source_document : 'No document found';
+    const confScore = typeof payload.confidence_score === 'number' ? payload.confidence_score : 0;
+    const confLevel = payload.confidence_level || 'LOW CONFIDENCE';
+
+    const item = {
+        id: 'q_' + Date.now(),
+        query: query,
+        domain: detectedDomain,
+        confidence_score: confScore,
+        confidence_level: confLevel,
+        source: sourceDoc,
+        timestamp: payload.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    };
+
+    let list = getQueryHistory();
+    list.unshift(item);
+    if (list.length > 30) list = list.slice(0, 30);
+    try {
+        localStorage.setItem('cogni_query_history', JSON.stringify(list));
+    } catch (e) {}
+    renderQueryHistory();
+}
+
+function renderQueryHistory() {
+    const tbody = document.getElementById('history-table-body');
+    const badge = document.getElementById('history-count-badge');
+    if (!tbody) return;
+
+    const list = getQueryHistory();
+    if (badge) badge.textContent = `${list.length} Quer${list.length === 1 ? 'y' : 'ies'} Logged`;
+
+    if (list.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-muted" style="padding: 2.2rem 1rem;">
+                    <i class="fa-solid fa-inbox" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; opacity: 0.4;"></i>
+                    No past queries recorded yet. Questions asked will appear here with their confidence score and domain attribution.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = list.map(item => {
+        const pct = (item.confidence_score * 100).toFixed(1);
+        let badgeClass = 'badge-danger';
+        let badgeIcon = 'fa-circle-xmark';
+        let levelLabel = 'Not Found';
+
+        if (item.confidence_score >= 0.70) {
+            badgeClass = 'badge-success';
+            badgeIcon = 'fa-circle-check';
+            levelLabel = 'High';
+        } else if (item.confidence_score >= 0.40) {
+            badgeClass = 'badge-warning';
+            badgeIcon = 'fa-circle-half-stroke';
+            levelLabel = 'Medium';
+        }
+
+        return `
+            <tr>
+                <td>
+                    <span class="history-query-text" onclick="loadPastQuery('${escapeHtml(item.query)}')" title="Click to reload this question into the input">
+                        <i class="fa-regular fa-message" style="margin-right: 6px; color: var(--primary);"></i>
+                        ${escapeHtml(item.query)}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge badge-info"><i class="fa-solid fa-folder"></i> ${escapeHtml(item.domain)}</span>
+                </td>
+                <td>
+                    <span class="badge ${badgeClass}">
+                        <i class="fa-solid ${badgeIcon}"></i> ${pct}% (${levelLabel})
+                    </span>
+                </td>
+                <td>
+                    <span style="font-weight: 600; color: var(--text-main); font-size: 0.82rem;">
+                        <i class="fa-regular fa-file-lines" style="color: var(--text-dim); margin-right: 4px;"></i>
+                        ${escapeHtml(item.source)}
+                    </span>
+                </td>
+                <td>
+                    <span class="text-muted" style="font-size: 0.76rem; font-family: var(--font-mono);">${escapeHtml(item.timestamp)}</span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+window.loadPastQuery = function(queryText) {
+    const input = document.getElementById('user-query-input');
+    if (input) {
+        input.value = queryText;
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+};

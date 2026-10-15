@@ -93,13 +93,16 @@ class ConversationMemoryAgent:
             if doc_name and doc_name not in self.session_docs[session_id]:
                 self.session_docs[session_id].append(doc_name)
                 
-        # Store interaction log
+        import time
+        doc_domain = citations[0].get("section", "General") if citations else "General"
         turn_data = {
             "turn_id": len(history) + 1,
             "user_query": user_query,
             "response_text": response_output.get("response_text", ""),
             "confidence_score": response_output.get("confidence_score", 0.0),
             "citations": citations,
+            "domain": doc_domain,
+            "timestamp": time.strftime("%H:%M:%S"),
             "query_type": response_output.get("query_type", "factual")
         }
         

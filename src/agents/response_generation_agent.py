@@ -37,18 +37,25 @@ class ResponseGenerationAgent:
         chunks = retrieval_output.get("top_k_chunks", [])
         max_score = retrieval_output.get("max_similarity_score", 0.0)
         
-        # 2. Handle empty retrieval or unindexed results dynamically
-        if not chunks or max_score < 0.30:
-            unindexed_answer = self._synthesize_unindexed_query_response(user_query, query_type)
+        # 2. Strict Grounded Check: If no relevant chunks or similarity is too low, do NOT hallucinate
+        if not chunks or max_score < 0.35:
+            score_disp = f"{max_score:.2f}" if max_score > 0 else "0.00"
+            not_found_text = (
+                f"⚠️ **Information Not Found in Uploaded Documents**\n\n"
+                f"The knowledge base does not contain verified content to answer: *\"{user_query.strip()}\"*\n\n"
+                f"• **Relevance Score**: {score_disp} (Below verification threshold 0.35)\n"
+                f"• **Reason**: This question is not covered in any of your currently uploaded documents.\n"
+                f"• **Recommendation**: Please upload the relevant document (`.pdf`, `.docx`, `.txt`, `.csv`) in the **Ingestion Engine** tab to enable grounded answers."
+            )
             return {
                 "agent_name": "Response Generation Agent",
                 "query_type": query_type,
-                "response_text": unindexed_answer,
-                "confidence_score": max_score if max_score > 0 else 0.50,
-                "confidence_level": "GENERAL KNOWLEDGE SYNTHESIS",
+                "response_text": not_found_text,
+                "confidence_score": max_score,
+                "confidence_level": "NOT FOUND / LOW CONFIDENCE",
                 "citations": [],
                 "grounded": False,
-                "status": "unindexed_synthesis"
+                "status": "not_found_in_documents"
             }
             
         # Build citations list
@@ -122,6 +129,17 @@ class ResponseGenerationAgent:
             
         scored_lines.sort(key=lambda x: x[0], reverse=True)
         top_matching_lines = [l for score, l in scored_lines if score > 0]
+        
+        # If no keywords matched and top chunk similarity is low, return not found
+        top_score = chunks[0].get("similarity_score", 0.0)
+        if not top_matching_lines and top_score < 0.45:
+            return (
+                f"⚠️ **Information Not Found in Uploaded Documents**\n\n"
+                f"The closest retrieved document (**{source_doc}**, {loc_info}) does not contain content relevant to your question: *\"{query.strip()}\"*.\n\n"
+                f"• **Closest Match Score**: {top_score:.2f} (Insufficient semantic overlap)\n"
+                f"• **Recommendation**: Please check your question or upload the document containing this information."
+            )
+
         if not top_matching_lines:
             top_matching_lines = explanatory_lines[:3]
 

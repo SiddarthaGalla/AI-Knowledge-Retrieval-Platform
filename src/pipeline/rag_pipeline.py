@@ -91,10 +91,15 @@ class RAGPipelineOrchestrator:
 
             elapsed_ms = round((time.time() - start_time) * 1000, 2)
 
+            domain_tag = domain_filter if (domain_filter and domain_filter != "all") else (ret_res["top_k_chunks"][0]["metadata"].get("domain") if ret_res.get("top_k_chunks") else "General")
+            query_timestamp = time.strftime("%H:%M:%S")
+
             return {
                 "user_query": user_query,
                 "resolved_query": resolved_query,
                 "session_id": session_id,
+                "domain": domain_tag,
+                "timestamp": query_timestamp,
                 "query_type": qua_res["query_type"],
                 "classification_confidence": qua_res["classification_confidence"],
                 "routing_path": qua_res["routing_path"],

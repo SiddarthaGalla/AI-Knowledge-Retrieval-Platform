@@ -266,6 +266,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SUB-PANEL: RECENT INQUIRIES & CONFIDENCE SCORE HISTORY -->
+            <div class="card history-card" id="history-section" style="margin-top: 1.25rem;">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-clock-rotate-left"></i> Past Inquiries & Query Analytics Log</h2>
+                    <div class="history-actions" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="badge badge-info" id="history-count-badge">0 Queries Logged</span>
+                        <button id="btn-clear-history" class="btn btn-secondary btn-sm" title="Clear Past Questions">
+                            <i class="fa-solid fa-trash-can"></i> Clear History
+                        </button>
+                    </div>
+                </div>
+                <div class="history-table-wrapper table-responsive">
+                    <table class="custom-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 34%;">Question / Query</th>
+                                <th style="width: 14%;">Domain</th>
+                                <th style="width: 18%;">Confidence Score</th>
+                                <th style="width: 22%;">Source Attribution</th>
+                                <th style="width: 12%;">Logged At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted" style="padding: 2.2rem 1rem;">
+                                    <i class="fa-solid fa-inbox" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; opacity: 0.4;"></i>
+                                    No past queries recorded yet. Questions asked will appear here with their confidence score and domain attribution.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </section>
 
         <!-- TAB 2: KNOWLEDGE BASE INGESTION ENGINE -->
