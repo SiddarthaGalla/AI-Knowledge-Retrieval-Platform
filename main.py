@@ -66,7 +66,15 @@ async def read_index():
     index_file = os.path.join(static_path, "index.html")
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
-            return f.read()
+            content = f.read()
+            return HTMLResponse(
+                content=content,
+                headers={
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0"
+                }
+            )
     return "<h1>AI Knowledge Retrieval Platform API Running</h1><p>UI loading...</p>"
 
 @app.get("/api/stats")
