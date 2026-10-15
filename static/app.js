@@ -703,10 +703,17 @@ function recordQueryHistory(query, payload) {
     const sourceDoc = payload.citations && payload.citations.length > 0 ? payload.citations[0].source_document : 'No document found';
     const confScore = typeof payload.confidence_score === 'number' ? payload.confidence_score : 0;
     const confLevel = payload.confidence_level || 'LOW CONFIDENCE';
+    
+    // Strict Answered vs Unanswered classification
+    const isAnswered = payload.grounded === true && 
+                       !payload.response_text?.includes('Information Not Found') && 
+                       confScore > 0;
+    const queryStatus = isAnswered ? 'Answered' : 'Unanswered';
 
     const item = {
         id: 'q_' + Date.now(),
         query: query,
+        status: queryStatus,
         domain: detectedDomain,
         confidence_score: confScore,
         confidence_level: confLevel,
@@ -729,14 +736,19 @@ function renderQueryHistory() {
     if (!tbody) return;
 
     const list = getQueryHistory();
-    if (badge) badge.textContent = `${list.length} Quer${list.length === 1 ? 'y' : 'ies'} Logged`;
+    const answeredCount = list.filter(i => i.status === 'Answered' || (i.status === undefined && i.confidence_score >= 0.40)).length;
+    const unansweredCount = list.length - answeredCount;
+    
+    if (badge) {
+        badge.textContent = `${list.length} Logged (${answeredCount} Answered · ${unansweredCount} Unanswered)`;
+    }
 
     if (list.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-muted" style="padding: 2.2rem 1rem;">
+                <td colspan="6" class="text-center text-muted" style="padding: 2.2rem 1rem;">
                     <i class="fa-solid fa-inbox" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; opacity: 0.4;"></i>
-                    No past queries recorded yet. Questions asked will appear here with their confidence score and domain attribution.
+                    No past queries recorded yet. Questions asked will appear here with their Answered/Unanswered status and confidence score.
                 </td>
             </tr>
         `;
@@ -759,6 +771,11 @@ function renderQueryHistory() {
             levelLabel = 'Medium';
         }
 
+        const isAnswered = item.status === 'Answered' || (item.status === undefined && item.confidence_score >= 0.40);
+        const statusBadge = isAnswered 
+            ? `<span class="badge badge-success" style="font-weight: 700; font-size: 0.78rem;"><i class="fa-solid fa-circle-check"></i> Answered</span>`
+            : `<span class="badge badge-danger" style="font-weight: 700; font-size: 0.78rem;"><i class="fa-solid fa-circle-xmark"></i> Unanswered</span>`;
+
         return `
             <tr>
                 <td>
@@ -766,6 +783,9 @@ function renderQueryHistory() {
                         <i class="fa-regular fa-message" style="margin-right: 6px; color: var(--primary);"></i>
                         ${escapeHtml(item.query)}
                     </span>
+                </td>
+                <td>
+                    ${statusBadge}
                 </td>
                 <td>
                     <span class="badge badge-info"><i class="fa-solid fa-folder"></i> ${escapeHtml(item.domain)}</span>
