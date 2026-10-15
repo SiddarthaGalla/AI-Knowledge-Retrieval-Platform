@@ -1199,9 +1199,6 @@ textarea#user-query-input::placeholder {
                 <button class="nav-btn" data-tab="tab-ingest">
                     <i class="fa-solid fa-file-import"></i> Ingestion Engine
                 </button>
-                <button class="nav-btn" data-tab="tab-eval">
-                    <i class="fa-solid fa-chart-simple"></i> Accuracy Benchmark
-                </button>
                 <button class="nav-btn" data-tab="tab-arch">
                     <i class="fa-solid fa-sitemap"></i> System Architecture
                 </button>
@@ -1237,10 +1234,10 @@ textarea#user-query-input::placeholder {
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="fa-solid fa-bullseye"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
                     <div class="stat-info">
-                        <span class="stat-val" id="stat-accuracy">100%</span>
-                        <span class="stat-lbl">Top-3 Retrieval Accuracy</span>
+                        <span class="stat-val">Grounded</span>
+                        <span class="stat-lbl">Zero-Hallucination Guard</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -1560,80 +1557,7 @@ textarea#user-query-input::placeholder {
             </div>
         </section>
 
-        <!-- TAB 3: RETRIEVAL ACCURACY BENCHMARK -->
-        <section id="tab-eval" class="tab-pane">
-            <div class="eval-layout">
-                <div class="card eval-header-card">
-                    <div class="eval-title-wrap">
-                        <h2><i class="fa-solid fa-chart-simple"></i> Multi-Domain RAG Retrieval Benchmark</h2>
-                        <p>Evaluates Top-1, Top-3, Top-5 Accuracy & Rejection Accuracy across Healthcare and Finance query sets.</p>
-                    </div>
-                    <button id="btn-run-eval" class="btn btn-primary">
-                        <i class="fa-solid fa-play"></i> Run Retrieval Benchmark
-                    </button>
-                </div>
 
-                <!-- Metric Gauges -->
-                <div class="eval-metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-title">Top-1 Accuracy</div>
-                        <div class="metric-value" id="val-top1">84.6%</div>
-                        <div class="metric-target">Target: >= 75%</div>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-top1" style="width: 84.6%;"></div></div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-title">Top-3 Accuracy</div>
-                        <div class="metric-value text-blue" id="val-top3">100%</div>
-                        <div class="metric-target">Target: >= 85%</div>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill fill-blue" id="bar-top3" style="width: 100%;"></div></div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-title">Top-5 Accuracy</div>
-                        <div class="metric-value" id="val-top5">100%</div>
-                        <div class="metric-target">Target: >= 92%</div>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-top5" style="width: 100%;"></div></div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-title">Rejection Accuracy</div>
-                        <div class="metric-value text-green" id="val-rejection">100%</div>
-                        <div class="metric-target">False Retrieval Rate: 0%</div>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill fill-green" id="bar-rejection" style="width: 100%;"></div></div>
-                    </div>
-                </div>
-
-                <!-- Execution Matrix Table -->
-                <div class="card eval-results-card">
-                    <div class="card-header">
-                        <h3><i class="fa-solid fa-list-check"></i> Benchmark Execution Matrix</h3>
-                        <span id="eval-summary-badge" class="badge badge-info">2 Domains Tested</span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="custom-table" id="eval-table">
-                            <thead>
-                                <tr>
-                                    <th>Query ID</th>
-                                    <th>Domain</th>
-                                    <th>Query Type</th>
-                                    <th>Query Text</th>
-                                    <th>Hit Rank</th>
-                                    <th>Confidence</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eval-table-body">
-                                <tr>
-                                    <td colspan="7" class="text-center">Click 'Run Retrieval Benchmark' to execute validation test suite.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- TAB 4: SYSTEM ARCHITECTURE -->
         <section id="tab-arch" class="tab-pane">

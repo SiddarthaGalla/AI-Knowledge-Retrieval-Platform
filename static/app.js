@@ -613,6 +613,7 @@ function resetTimeline() {
    ========================================================================== */
 function initEvaluationModule() {
     const btnRunEval = document.getElementById('btn-run-eval');
+    if (!btnRunEval) return;
     const tbody = document.getElementById('eval-table-body');
 
     btnRunEval?.addEventListener('click', async () => {
