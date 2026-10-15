@@ -9,6 +9,25 @@ class ResponseGenerationAgent:
     attaches exact source attribution pills, and computes application-level confidence display indicators.
     """
     
+    GENERIC_FILLER_WORDS = {
+        'what', 'when', 'where', 'which', 'who', 'whom', 'whose', 'why', 'how',
+        'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did',
+        'have', 'has', 'had', 'having', 'can', 'could', 'should', 'would', 'may', 'might', 'must',
+        'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'with',
+        'by', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after',
+        'above', 'below', 'from', 'up', 'down', 'out', 'off', 'over', 'under',
+        'again', 'further', 'then', 'once', 'here', 'there', 'all', 'any', 'both', 'each',
+        'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+        'same', 'so', 'than', 'too', 'very', 'just', 'should', 'now',
+        'document', 'documents', 'file', 'files', 'policy', 'procedure', 'process', 'rule', 'rules',
+        'guideline', 'guidelines', 'manual', 'handbook', 'information', 'details', 'company',
+        'organization', 'overview', 'standard', 'standards', 'system', 'systems', 'team',
+        'work', 'employee', 'employees', 'staff', 'member', 'members', 'according', 'based',
+        'tell', 'give', 'explain', 'describe', 'provide', 'please', 'regarding', 'related',
+        'code', 'notice', 'period', 'duration', 'level', 'levels', 'type', 'types',
+        'status', 'number', 'numbers', 'list', 'form', 'forms', 'time', 'times', 'day', 'days'
+    }
+    
     def process(
         self, 
         user_query: str, 
@@ -51,7 +70,29 @@ class ResponseGenerationAgent:
                 "agent_name": "Response Generation Agent",
                 "query_type": query_type,
                 "response_text": not_found_text,
-                "confidence_score": max_score,
+                "confidence_score": 0.0,
+                "confidence_level": "NOT FOUND / LOW CONFIDENCE",
+                "citations": [],
+                "grounded": False,
+                "status": "not_found_in_documents"
+            }
+
+        # 3. Deep Query-to-Chunk Entity Grounding Verification
+        is_grounded, grounding_reason = self._verify_grounding(user_query, chunks)
+        if not is_grounded:
+            source_doc = chunks[0].get("metadata", {}).get("file_name", "Uploaded Document")
+            not_found_text = (
+                f"⚠️ **Information Not Found in Uploaded Documents**\n\n"
+                f"The question *\"{user_query.strip()}\"* asks about a topic not present in **{source_doc}**.\n\n"
+                f"• **Reason**: {grounding_reason}\n"
+                f"• **Groundedness Check**: Failed (Out-of-document query)\n"
+                f"• **Recommendation**: Please upload the document covering this specific subject to get a verified response."
+            )
+            return {
+                "agent_name": "Response Generation Agent",
+                "query_type": query_type,
+                "response_text": not_found_text,
+                "confidence_score": 0.0,
                 "confidence_level": "NOT FOUND / LOW CONFIDENCE",
                 "citations": [],
                 "grounded": False,
@@ -88,6 +129,39 @@ class ResponseGenerationAgent:
             "status": "completed"
         }
 
+    def _verify_grounding(self, query: str, chunks: List[Dict[str, Any]]) -> tuple[bool, str]:
+        if not chunks:
+            return False, "No chunks retrieved."
+        
+        all_chunk_text = " ".join([c.get("content", "").lower() for c in chunks])
+        core_terms = [w for w in re.findall(r"\b[a-zA-Z0-9_\-]{3,}\b", query.lower()) if w not in self.GENERIC_FILLER_WORDS]
+        
+        if not core_terms:
+            top_score = chunks[0].get("similarity_score", 0.0)
+            if top_score >= 0.65:
+                return True, "Passed generic high-confidence match."
+            return False, "Query contains only generic filler words without a specific topic anchor."
+            
+        matched_terms = [t for t in core_terms if t in all_chunk_text]
+        
+        # Grounding decision logic:
+        # 1 term query: Must match that exact term
+        if len(core_terms) == 1:
+            is_grounded = (len(matched_terms) == 1)
+        # 2 terms query: Must match both terms
+        elif len(core_terms) == 2:
+            is_grounded = (len(matched_terms) == 2)
+        # 3+ terms query: Must match at least 2 terms and at least 50% of the core terms
+        else:
+            is_grounded = (len(matched_terms) >= 2 and (len(matched_terms) / len(core_terms)) >= 0.50)
+            
+        if not is_grounded:
+            missing = [t for t in core_terms if t not in matched_terms]
+            reason = f"Missing core topic keywords in uploaded document: {', '.join(missing[:4])}"
+            return False, reason
+            
+        return True, "Verified grounded content."
+
     def _synthesize_response_by_type(
         self, 
         query: str, 
@@ -101,47 +175,43 @@ class ResponseGenerationAgent:
         source_doc = citations[0]["source_document"]
         loc_info = f"Page/Row {citations[0]['page_or_row']}"
 
-        # Clean lines from chunks, ignoring raw question title headers (e.g., "28. What happens...")
+        # Clean lines from chunks, ignoring raw question title headers
         lines = []
         for chunk in chunks:
             for line in chunk["content"].split("\n"):
                 l_strip = line.strip()
                 if not l_strip:
                     continue
-                # Filter out lines that are just echoing question titles or test prompts
                 if re.match(r"^\d+[\.\)]\s*(what|how|why|when|where|which|can|explain)", l_strip, re.IGNORECASE) and l_strip.endswith("?"):
                     continue
                 lines.append(l_strip)
 
-        # Extract explanatory body lines from retrieved chunks
         explanatory_lines = [l for l in lines if not l.endswith("?") and len(l) > 15]
         if not explanatory_lines:
             explanatory_lines = [l.strip() for chunk in chunks for l in chunk["content"].split("\n") if l.strip()]
 
-        # Rank lines by keyword relevance to the user's query
-        q_words = set(re.findall(r"\w+", query.lower())) - {"what", "how", "why", "when", "where", "which", "is", "are", "the", "a", "an", "in", "of", "and", "or", "for", "to", "do", "does", "did"}
-        
+        # Rank lines by distinctive query terms
+        core_terms = [w for w in re.findall(r"\b[a-zA-Z0-9_\-]{3,}\b", query.lower()) if w not in self.GENERIC_FILLER_WORDS]
+        if not core_terms:
+            core_terms = [w for w in re.findall(r"\w+", query.lower()) if len(w) > 2]
+            
         scored_lines = []
         for l in explanatory_lines:
-            l_words = set(re.findall(r"\w+", l.lower()))
-            score = len(q_words.intersection(l_words))
-            scored_lines.append((score, l))
+            l_lower = l.lower()
+            score = sum(1 for t in core_terms if t in l_lower)
+            if score > 0:
+                scored_lines.append((score, l))
             
         scored_lines.sort(key=lambda x: x[0], reverse=True)
-        top_matching_lines = [l for score, l in scored_lines if score > 0]
+        top_matching_lines = [l for score, l in scored_lines]
         
-        # If no keywords matched and top chunk similarity is low, return not found
-        top_score = chunks[0].get("similarity_score", 0.0)
-        if not top_matching_lines and top_score < 0.45:
+        # If no lines contain the core terms, refuse rather than quoting arbitrary lines
+        if not top_matching_lines:
             return (
                 f"⚠️ **Information Not Found in Uploaded Documents**\n\n"
-                f"The closest retrieved document (**{source_doc}**, {loc_info}) does not contain content relevant to your question: *\"{query.strip()}\"*.\n\n"
-                f"• **Closest Match Score**: {top_score:.2f} (Insufficient semantic overlap)\n"
-                f"• **Recommendation**: Please check your question or upload the document containing this information."
+                f"The closest retrieved document (**{source_doc}**, {loc_info}) does not contain content answering: *\"{query.strip()}\"*.\n\n"
+                f"• **Recommendation**: Please verify your question or upload the document containing this information."
             )
-
-        if not top_matching_lines:
-            top_matching_lines = explanatory_lines[:3]
 
         if query_type == "procedural":
             steps = [l for l in top_matching_lines if re.match(r"^\d+[\.\)]", l) or "step" in l.lower() or ":" in l or len(l) > 20]
