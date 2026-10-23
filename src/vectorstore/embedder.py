@@ -15,7 +15,12 @@ class EmbeddingGenerator:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         self.model_name = model_name
         self.st_model = None
-        self._init_model()
+        self._model_initialized = False
+
+    def _ensure_model(self):
+        if not self._model_initialized:
+            self._init_model()
+            self._model_initialized = True
 
     def _init_model(self):
         try:
@@ -30,6 +35,7 @@ class EmbeddingGenerator:
         if not texts:
             return []
             
+        self._ensure_model()
         if self.st_model is not None:
             try:
                 embeddings = self.st_model.encode(texts, convert_to_numpy=True, show_progress_bar=False)
